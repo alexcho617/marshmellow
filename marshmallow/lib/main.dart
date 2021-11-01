@@ -1,44 +1,46 @@
+//core packages
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:firebase_core/firebase_core.dart' as firebase_core;
+
+//third party packages
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:bordered_text/bordered_text.dart';
-import 'package:marshmallow/screens/home/home.dart';
+
+//imports within project
 import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/utils/colors.dart';
+import 'package:marshmallow/screens/home/home.dart';
+import 'package:marshmallow/screens/setting/setting.dart';
 
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await firebase_core.Firebase.initializeApp();
 
-void main() {
   runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
       title: 'MARSHMALLOW',
-        debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          backgroundColor: backgroundBlue,
-        ),
+      debugShowCheckedModeBanner: false,
+      theme: ThemeData(
+        backgroundColor: backgroundBlue,
+      ),
       home: SplashPage(),
     );
   }
 }
 
 class SplashPage extends StatelessWidget {
-
   @override
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
-      splash: Image.asset(
-        'assets/splash.png',
-        width: 250
-      ),
-      nextScreen: HomePage(),
-      
+      splash: Image.asset('assets/splash.png', width: 250),
+      nextScreen: SettingPage(),
       splashTransition: SplashTransition.fadeTransition,
-     
     );
   }
 }
