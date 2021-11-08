@@ -1,9 +1,36 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:marshmallow/screens/landing/landing.dart';
+import 'package:marshmallow/utils/colors.dart';
+import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/utils/utils.dart';
+import 'package:marshmallow/widgets/button.dart';
 import '../../services/firebase.dart';
 import '../../models/user.dart';
+import 'localwidget/logoAndTitle.dart';
+
+class WelcomePage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: yellow,
+      body: SafeArea(
+        child: Column(
+          children: [
+            logoAndTitle('WELCOME!'),
+            SizedBox(height:17),
+            Text('마쉬멜로는 함께 즐기는 사물인식 게임입니다',
+              style: body2style(),
+            ),
+            SizedBox(height:226),
+            mediumButtonTheme('다음', (){Get.to(SettingPage());})
+          ]
+        ),
+      ),
+    );
+  }
+}
 
 enum settingState { id, avatar }
 
@@ -24,56 +51,70 @@ class _SettingPageState extends State<SettingPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: yellow,
       body: SafeArea(
         child: Center(
             child: currentState == settingState.id
                 ? Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text('Nickname'),
+                      logoAndTitle('Nickname'),
                       Padding(
-                        padding: const EdgeInsets.all(8.0),
+                        padding: const EdgeInsets.fromLTRB(42,10,42,32),
                         child: TextField(
                           controller: _idController,
                           decoration:
-                              InputDecoration(hintText: "활동할 닉네임을 입력하세요."),
+                            InputDecoration(
+                              
+                              hintText: "활동할 닉네임을 입력하세요.",
+                              hintStyle: body1style()
+                            )
                         ),
                       ),
-                      ElevatedButton(
-                        onPressed: performIdCheck,
-                        child: Text("중복확인"),
-                      )
+                      smallButtonTheme("중복확인", performIdCheck),
+                      SizedBox(height: 132),
+                      mediumButtonTheme('다음', (){Get.to(SettingPage());})
                     ],
                   )
                 : Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        radius: 60.0,
-                        backgroundImage: buildImage(context, index),
-                      ),
-                      Center(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    logoAndTitle('Character'),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 150,
+                          height: 150,
+                          child: CircleAvatar(
+                            radius: 60.0,
+                            backgroundColor: backgroundBlue,
+                            child: buildImage(context, index)
+                          ),
+                        ),
+                        
+                        SizedBox(width: 30),
+                        Column(
                           children: [
-                            Text('${user.avatarIndex.toString()}'),
-                            ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  index = random.nextInt(9);
-                                  user.avatarIndex = index;
-                                });
-                              },
-                              child: Text('다시뽑기'),
-                            ),
+                            smallButtonTheme('다시뽑기', () {
+                              setState(() {
+                                index = random.nextInt(9);
+                                user.avatarIndex = index;
+                              });
+                            },),
+                            
                           ],
                         ),
-                      ),
-                      ElevatedButton(
-                          onPressed: performUserRegistration, child: Text('등록'))
-                    ],
-                  )),
-      ),
+                      ]
+                    ),
+                    SizedBox(height: 95),
+                    mediumButtonTheme('등록', (){
+                      performUserRegistration();
+                      Get.to(LandingPage());
+                    })
+                  ]
+                ),
+        )
+      )
     );
   }
 
@@ -99,8 +140,16 @@ class _SettingPageState extends State<SettingPage> {
     }
   }
 
-  AssetImage buildImage(BuildContext context, int index) {
+  Container buildImage(BuildContext context, int index) {
     String image_name = listAvatarImages[index].toString();
-    return AssetImage(image_name.toString());
+    return Container(
+      width:113,
+      height:113,
+        child: Image(
+        image:AssetImage(
+          image_name.toString()
+        ),
+      )
+    );
   }
 }

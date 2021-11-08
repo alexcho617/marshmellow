@@ -13,6 +13,8 @@ import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/screens/home/home.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
 
+import 'package:marshmallow/screens/landing/landing.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await firebase_core.Firebase.initializeApp();
@@ -38,9 +40,12 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
-      splash: Image.asset('assets/splash.png', width: 250),
-      nextScreen: SettingPage(),
+      
+      backgroundColor: blue,
+      splash: Image.asset('assets/splash.png',),
+      nextScreen: WelcomePage(),
       splashTransition: SplashTransition.fadeTransition,
+      splashIconSize: 175,
     );
   }
 }
