@@ -7,8 +7,10 @@ import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/utils/utils.dart';
 import 'package:marshmallow/widgets/button.dart';
 import '../../services/firebase.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import '../../models/user.dart';
 import 'localwidget/logoAndTitle.dart';
+// import 'package:firebase_auth/firebase_auth.dart';
 
 class WelcomePage extends StatelessWidget {
   @override
@@ -36,6 +38,7 @@ class WelcomePage extends StatelessWidget {
 enum settingState { id, avatar }
 
 List listAvatarImages = avatarRepository;
+final _auth = FirebaseAuth.instance;
 
 class SettingPage extends StatefulWidget {
   @override
@@ -43,7 +46,7 @@ class SettingPage extends StatefulWidget {
 }
 
 class _SettingPageState extends State<SettingPage> {
-  User user = User(globalToken: 0, localToken: 0, avatarIndex: 0);
+  GameUser user = GameUser(globalToken: 0, localToken: 0, avatarIndex: 0);
   Random random = Random();
   TextEditingController _idController = TextEditingController();
   var currentState = settingState.id;
@@ -106,8 +109,16 @@ class _SettingPageState extends State<SettingPage> {
                           ]),
                       SizedBox(height: 95),
                       mediumButtonTheme('등록', () async {
-                        await firestoreAddUser(user);
-                        Get.to(() => LandingPage(), arguments: user);
+                        await signInAnonymously();
+
+                        if (_auth.currentUser == null) {
+                          print("user is null");
+                        } else {
+                          user.uid = _auth.currentUser!.uid;
+                          print('sign in confirm ${_auth.currentUser!.uid}');
+                          await firestoreAddUser(user, user.uid);
+                          Get.to(() => LandingPage(), arguments: user);
+                        }
                       })
                     ]),
         )));
@@ -120,6 +131,7 @@ class _SettingPageState extends State<SettingPage> {
         //id is ok
         setState(() {
           print('$targetId AVAILABLE');
+          snackbar('중복체크', '사용 가능한 아이디입니다.');
           user.id = targetId;
           currentState = settingState.avatar;
         });
@@ -128,11 +140,30 @@ class _SettingPageState extends State<SettingPage> {
         currentState = settingState.avatar;
       } else {
         //id is not ok
+        snackbar('중복체크', '이미 사용중인 아이디입니다.');
+
         print('$targetId TAKEN');
       }
     } else {
       print('EMPTY STRING');
     }
+  }
+
+  void snackbar(String title, String message) {
+    return Get.snackbar(
+      title,
+      message,
+      icon: Icon(Icons.person, color: Colors.white),
+      snackPosition: SnackPosition.BOTTOM,
+      backgroundColor: blue,
+      borderRadius: 20,
+      margin: EdgeInsets.all(15),
+      colorText: darkGrey,
+      duration: Duration(seconds: 2),
+      isDismissible: true,
+      dismissDirection: SnackDismissDirection.HORIZONTAL,
+      forwardAnimationCurve: Curves.easeOutBack,
+    );
   }
 
   Container buildImage(BuildContext context, int index) {
