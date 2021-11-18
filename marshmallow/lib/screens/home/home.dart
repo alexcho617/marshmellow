@@ -11,6 +11,8 @@ import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/widgets/button.dart';
 import 'package:marshmallow/widgets/userMarshInfo.dart';
 
+GameUser currentPlayer = GameUser();
+
 class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
@@ -18,7 +20,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<String> uid;
-  GameUser currentPlayer = GameUser();
   final _auth = FirebaseAuth.instance;
 
   @override
@@ -30,6 +31,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print('BUILD PLAYER ID ${currentPlayer.id}');
     var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: backgroundBlue,
@@ -43,25 +45,27 @@ class _HomePageState extends State<HomePage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            SizedBox(height: 48,),
+            SizedBox(
+              height: 48,
+            ),
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('${currentPlayer.id}',
+                Text(
+                  '${currentPlayer.id}',
                   style: head1style(),
                 ),
                 Padding(
                   padding: EdgeInsets.only(left: 1, bottom: 2),
-                  child: Text('님, 안녕하세요',
+                  child: Text(
+                    '님, 안녕하세요',
                     style: body2style(),
                   ),
                 ),
                 Spacer(),
                 UserMArshInfo()
               ],
-              
             ),
-            
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 30),
               child: Image.asset('assets/home.png'),
@@ -70,83 +74,69 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: 155,
-                  height: 200,
-                  child: OutlinedButton(
-                    
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '팀장',
-                          style: head1style()
-                        ),
-                        SizedBox(height:5),
-                        Text(
-                          '방 만들기',
-                          style: body1style()
-                        ),
-                      ],
-                    ),
-                    style: OutlinedButton.styleFrom (
-                      backgroundColor: yellow,
-                      side: BorderSide(color: darkGrey),
-                      shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(35),
+                    width: 155,
+                    height: 200,
+                    child: OutlinedButton(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('팀장', style: head1style()),
+                          SizedBox(height: 5),
+                          Text('방 만들기', style: body1style()),
+                        ],
                       ),
-                    ),
-                    onPressed: (){
-                      Get.to(() => GameSettingPage());
-                    },
-                  )
-                ),
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: yellow,
+                        side: BorderSide(color: darkGrey),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(35),
+                        ),
+                      ),
+                      onPressed: () {
+                        Get.to(() => GameSettingPage());
+                      },
+                    )),
                 Container(
-                  width: 155,
-                  height: 200,
-                  child: OutlinedButton(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text(
-                          '팀원',
-                          style: head1style()
-                        ),
-                        SizedBox(height:5),
-                        Text(
-                          '참가하기',
-                          style: body1style()
-                        ),
-                      ],
-                    ),
-                    style: OutlinedButton.styleFrom (
-                      backgroundColor: yellow,
-                      side: BorderSide(color: darkGrey),
-                      shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(35),
+                    width: 155,
+                    height: 200,
+                    child: OutlinedButton(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text('팀원', style: head1style()),
+                          SizedBox(height: 5),
+                          Text('참가하기', style: body1style()),
+                        ],
                       ),
-                    ),
-                    onPressed: (){},
-                  )
-                )
+                      style: OutlinedButton.styleFrom(
+                        backgroundColor: yellow,
+                        side: BorderSide(color: darkGrey),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(35),
+                        ),
+                      ),
+                      onPressed: () {},
+                    ))
               ],
             )
-            
           ],
         ),
       ),
       floatingActionButton: Container(
-        height: 74.0,
-        width: 74.0,
-        child: FittedBox(
-          child: FloatingActionButton(
+          height: 74.0,
+          width: 74.0,
+          child: FittedBox(
+              child: FloatingActionButton(
             onPressed: () {
               // Add your onPressed code here!
+              printUserData();
             },
-            child: Image.asset('assets/trophy.png', width: 40,),
+            child: Image.asset(
+              'assets/trophy.png',
+              width: 40,
+            ),
             backgroundColor: blue,
-          )
-        )
-      ),
+          ))),
     );
   }
 
