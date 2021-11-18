@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:marshmallow/models/user.dart';
 import 'package:marshmallow/screens/gameSetting/gameSetting.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
+import 'package:marshmallow/screens/home/localwidget/enteranceCode.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
@@ -31,7 +32,10 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
+    print(currentPlayer.globalToken);
+    
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: backgroundBlue,
       appBar: AppBar(
         backgroundColor: backgroundBlue,
@@ -57,11 +61,11 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 Spacer(),
-                UserMArshInfo()
-              ],
+                
               
+                UserMArshInfo(currentPlayer.globalToken)
+              ],
             ),
-            
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 30),
               child: Image.asset('assets/home.png'),
@@ -70,8 +74,8 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  width: 155,
-                  height: 200,
+                  width: 165,
+                  height: 218,
                   child: OutlinedButton(
                     
                     child: Column(
@@ -101,8 +105,8 @@ class _HomePageState extends State<HomePage> {
                   )
                 ),
                 Container(
-                  width: 155,
-                  height: 200,
+                  width: 165,
+                  height: 218,
                   child: OutlinedButton(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -125,7 +129,8 @@ class _HomePageState extends State<HomePage> {
                       borderRadius: BorderRadius.circular(35),
                       ),
                     ),
-                    onPressed: (){},
+                    onPressed: () async {
+                      final String currentTeam = await _asyncInputDialog(context);},
                   )
                 )
               ],
@@ -178,4 +183,83 @@ class _HomePageState extends State<HomePage> {
       currentPlayer.uid = uid;
     });
   }
+
+  Future _asyncInputDialog(BuildContext context) async {
+    String teamName = '';
+      
+    return showDialog(
+      context: context,
+      barrierDismissible: false, // dialog is dismissible with a tap on the barrier
+      builder: (context) {
+        return AlertDialog(
+          titlePadding: EdgeInsets.zero,
+          contentPadding: EdgeInsets.zero,
+
+          backgroundColor: pink,
+          shape: RoundedRectangleBorder(
+            
+            side: BorderSide(color: darkGrey),
+            borderRadius: BorderRadius.all(Radius.circular(30.0))),
+          content: Container(
+            width: 346,
+            height: 218,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _getCloseButton(context),
+                Text('입장코드', style: head1style()),
+                SizedBox(height:15),
+                Container(
+                  width: 266,
+                  height: 69,
+                  alignment: Alignment.center,
+                  color: white.withOpacity(0.6),
+                  child: TextField(
+                    
+                    textAlign: TextAlign.center,
+                    autofocus: false,
+                    keyboardType: TextInputType.number,
+                    decoration: new InputDecoration(
+                      contentPadding: EdgeInsets.zero,
+                      border: InputBorder.none,
+                      hintText: '네자리 숫자를 입력하세요',
+                      hintStyle: body1style(),
+              
+                    ),
+                    style: body6style(),
+                    
+                    onChanged: (value) {
+                      teamName = value;
+                    },
+                  ),
+                ),
+                SizedBox(height:14),
+                smallButtonTheme('들어가기', (){})
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+  _getCloseButton(context) {
+    return Padding(
+      padding: const EdgeInsets.only(right:15),
+      child: GestureDetector(
+        child: Container(
+          alignment: FractionalOffset.topRight,
+          child: GestureDetector(
+            child: Icon(
+              Icons.clear,
+              color: darkGrey
+            ),
+            onTap: (){
+              Navigator.pop(context);
+            },
+          ),
+        ),
+      ),
+    );
+  }
 }
+
