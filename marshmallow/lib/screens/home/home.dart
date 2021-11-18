@@ -47,7 +47,7 @@ class _HomePageState extends State<HomePage> {
             Row(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text('${user.id}',
+                Text('${currentPlayer.id}',
                   style: head1style(),
                 ),
                 Padding(
