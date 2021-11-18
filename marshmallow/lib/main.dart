@@ -1,4 +1,5 @@
 //core packages
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:firebase_core/firebase_core.dart' as firebase_core;
@@ -43,9 +44,32 @@ class SplashPage extends StatelessWidget {
       
       backgroundColor: blue,
       splash: Image.asset('assets/splash.png',),
-      nextScreen: WelcomePage(),
+      nextScreen: PageInitializer(),
       splashTransition: SplashTransition.fadeTransition,
       splashIconSize: 175,
     );
+  }
+}
+
+
+class PageInitializer extends StatefulWidget {
+  const PageInitializer({Key? key}) : super(key: key);
+
+  @override
+  _PageInitializerState createState() => _PageInitializerState();
+}
+
+class _PageInitializerState extends State<PageInitializer> {
+  @override
+  Widget build(BuildContext context) {
+    FirebaseAuth _auth = FirebaseAuth.instance;
+    final user = _auth.currentUser;
+    if (user != null) {
+      User loggedInUser = user;
+      print('AUTO LOG IN SUCCESS(main.dart): Signed in As:${loggedInUser.uid}');
+      return HomePage();
+    } else {
+      return WelcomePage();
+    }
   }
 }

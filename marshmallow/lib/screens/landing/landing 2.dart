@@ -8,9 +8,10 @@ import 'package:marshmallow/widgets/button.dart';
 import 'package:introduction_screen/introduction_screen.dart';
 import 'package:marshmallow/models/user.dart';
 
+var user = Get.arguments;
+
 class LandingPage extends StatelessWidget {
-  GameUser user = Get.arguments;
-  final onboardingPagesList = [
+  var onboardingPagesList = [
     PageViewModel(
       titleWidget: SizedBox(height: 15),
       bodyWidget: Image.asset('assets/landing1.png', width: 288),
@@ -34,13 +35,13 @@ class LandingPage extends StatelessWidget {
           point1style(data: 'Let’s Go!!'),
           SizedBox(height: 22),
           mediumButtonTheme('시작하기', () {
-            Get.to(HomePage());
+            goToHome();
           })
         ]))
   ];
   @override
   Widget build(BuildContext context) {
-    print('GetX:${user.id}');
+    print('GetX_LANDING:${user.id}');
 
     return IntroductionScreen(
       globalBackgroundColor: yellow,
@@ -49,4 +50,8 @@ class LandingPage extends StatelessWidget {
       showNextButton: false,
     );
   }
+}
+
+void goToHome() {
+  Get.to(() => HomePage(), arguments: user);
 }

@@ -2,15 +2,12 @@ import 'package:flutter/material.dart';
 
 enum UserType { host, player }
 
-class User {
-  User({
-    required this.avatarIndex,
-    required this.globalToken,
-    required this.localToken,
-  });
-  int avatarIndex = 0;
-  int globalToken = 0;
-  int localToken = 0;
-  String id = '';
+class GameUser {
+  GameUser({this.avatarIndex, this.globalToken, this.localToken, this.uid});
+  dynamic avatarIndex = 0;
+  dynamic globalToken = 0;
+  dynamic localToken = 0;
+  dynamic uid = '';
+  dynamic id = '';
   UserType type = UserType.player;
 }
