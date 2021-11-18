@@ -107,6 +107,17 @@ TextStyle body5style({double? height, Color? color: darkGrey, double? opacity:1.
   );
 }
 
+
+TextStyle body6style({double? height, Color? color: darkGrey, double? opacity:1.0}) {
+  return TextStyle(
+    fontSize: 36,
+    fontWeight: FontWeight.w400,
+    fontFamily: 'Main',
+    color: color!.withOpacity(opacity!),
+    height: height,
+  );
+}
+
 TextStyle cautionstyle({double? height, Color? color: caution, double? opacity:1.0}) {
   return TextStyle(
     fontSize: 10,
