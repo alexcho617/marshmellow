@@ -32,9 +32,9 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print('BUILD PLAYER ID ${currentPlayer.id}');
+    //print('BUILD PLAYER ID ${currentPlayer.id}');
     var size = MediaQuery.of(context).size;
-    print(currentPlayer.globalToken);
+    //print(currentPlayer.globalToken);
 
     return Scaffold(
       resizeToAvoidBottomInset: false,

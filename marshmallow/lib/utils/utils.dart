@@ -10,18 +10,21 @@ List avatarRepository = [
   "assets/avatars/tiger.png",
 ];
 
-List wordRepository = [
+List<String> wordRepository = [
   "analog clock",
   "digital clock",
   "apple",
   "banana",
   "orange",
-  "kiwi"
-  "book"
-  "mouse"
-  "keyboard"
-  "computer"
-  "laptop"
-  "monitor"
-  "speaker"
+  "kiwi",
+  "book",
+  "mouse",
+  "keyboard",
+  "computer",
+  "laptop",
+  "monitor",
+  "speaker",
+  "pen",
+  "pencil",
+  "eraser"
 ];
