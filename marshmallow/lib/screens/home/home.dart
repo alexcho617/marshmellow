@@ -12,6 +12,8 @@ import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/widgets/button.dart';
 import 'package:marshmallow/widgets/userMarshInfo.dart';
 
+GameUser currentPlayer = GameUser();
+
 class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
@@ -19,7 +21,6 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   late Future<String> uid;
-  GameUser currentPlayer = GameUser();
   final _auth = FirebaseAuth.instance;
   bool userLoaded = false;
   @override
@@ -31,6 +32,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    print('BUILD PLAYER ID ${currentPlayer.id}');
     var size = MediaQuery.of(context).size;
     print(currentPlayer.globalToken);
 
@@ -65,6 +67,7 @@ class _HomePageState extends State<HomePage> {
                           style: body2style(),
                         ),
                       ),
+                      TextButton(onPressed: signOut, child: Text('SignOut')),
                       Spacer(),
                       UserMArshInfo(currentPlayer.globalToken ?? 0)
                     ],
@@ -78,7 +81,9 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                    width: 165,
+                    //Alex: OverFLow, adjust width
+                    // width: 165,
+                    width: 150,
                     height: 218,
                     child: OutlinedButton(
                       child: Column(
@@ -101,7 +106,9 @@ class _HomePageState extends State<HomePage> {
                       },
                     )),
                 Container(
-                    width: 165,
+                    //Alex: OverFLow, adjust width
+                    // width: 165,
+                    width: 150,
                     height: 218,
                     child: OutlinedButton(
                       child: Column(
@@ -121,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       onPressed: () async {
                         final String currentTeam =
-                            await _asyncInputDialog(context);
+                            await _asyncInputDialog(context) ?? '';
                       },
                     ))
               ],
@@ -136,6 +143,7 @@ class _HomePageState extends State<HomePage> {
               child: FloatingActionButton(
             onPressed: () {
               // Add your onPressed code here!
+              printUserData();
             },
             child: Image.asset(
               'assets/trophy.png',

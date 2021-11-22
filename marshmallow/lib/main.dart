@@ -23,6 +23,9 @@ void main() async {
   runApp(MyApp());
 }
 
+//change this to true to enable splash
+bool splashEnabled = false;
+
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -32,7 +35,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         backgroundColor: backgroundBlue,
       ),
-      home: SplashPage(),
+      home: splashEnabled ? SplashPage() : PageInitializer(),
     );
   }
 }
@@ -41,16 +44,16 @@ class SplashPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedSplashScreen(
-      
       backgroundColor: blue,
-      splash: Image.asset('assets/splash.png',),
+      splash: Image.asset(
+        'assets/splash.png',
+      ),
       nextScreen: PageInitializer(),
       splashTransition: SplashTransition.fadeTransition,
       splashIconSize: 175,
     );
   }
 }
-
 
 class PageInitializer extends StatefulWidget {
   const PageInitializer({Key? key}) : super(key: key);
