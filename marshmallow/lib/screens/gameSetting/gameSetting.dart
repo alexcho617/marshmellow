@@ -14,6 +14,8 @@ class GameSettingPage extends StatefulWidget {
 
 class _GameSettingPageState extends State<GameSettingPage> {
   List<String> wordSet = [];
+  final random = Random();
+
   final List<String> _dropdownValues = ["3", "4", "5", "6", "7"];
   var _currentlySelected;
 
@@ -111,7 +113,7 @@ class _GameSettingPageState extends State<GameSettingPage> {
                       child: DropdownButton(
                         value: _currentlySelected,
                         hint: Text(
-                          '3',
+                          '0',
                           style: body3style(),
                         ),
                         items: _dropdownValues
@@ -157,26 +159,25 @@ class _GameSettingPageState extends State<GameSettingPage> {
 
   void getRandomKeywords() {
     wordSet.clear();
-    final random = Random();
     int i, j = 0;
     for (i = 0; i < 12; i++) {
       j = random.nextInt(wordRepository.length);
-      String word = wordRepository.elementAt(j);
+      String word = wordRepository[j];
       wordSet.add(word);
     }
     print(wordSet);
   }
 
-  //set version
+  // //set version
   // void getRandomKeywords() {
   //   wordSet.clear();
   //   Set<String> repository = {};
+  //   //Have to deep copy
   //   repository = wordRepository;
   //   final random = Random();
   //   int i, j = 0;
 
   //   for (i = 0; i < 10; i++) {
-
   //     j = random.nextInt(repository.length);
   //     print('j:$j');
   //     String word = repository.elementAt(j);

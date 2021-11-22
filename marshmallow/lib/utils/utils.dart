@@ -10,7 +10,7 @@ List avatarRepository = [
   "assets/avatars/tiger.png",
 ];
 
-Set<String> wordRepository = {
+List<String> wordRepository = [
   "analog clock",
   "digital clock",
   "apple",
@@ -27,4 +27,4 @@ Set<String> wordRepository = {
   "pen",
   "pencil",
   "eraser"
-};
+];
