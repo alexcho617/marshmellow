@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:marshmallow/models/game.dart';
 import 'package:marshmallow/models/user.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -53,6 +54,23 @@ Future<void> firestoreAddUser(GameUser newUser, String uid) async {
       })
       .then((value) => print("User Added"))
       .catchError((error) => print("Failed to add user: $error"));
+}
+
+Future<void> firestoreNewGame(Game newGame, String code) async {
+  CollectionReference gamerooms = firestore.collection('GameRooms');
+  await gamerooms
+      .doc(code)
+      .set({
+        'code': newGame.code,
+        'keywords': newGame.keywords,
+        'host': newGame.host,
+        'playerCount': newGame.playerCount,
+        'playerLimit': newGame.playerLimit,
+        'timeLimit': newGame.timeLimit,
+        'players': newGame.players
+      })
+      .then((value) => print("Game Added"))
+      .catchError((error) => print("Failed to add game: $error"));
 }
 
 //AUTHENTICATION

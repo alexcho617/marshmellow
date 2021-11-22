@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:marshmallow/models/game.dart';
+import 'package:marshmallow/screens/home/home.dart';
+import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/utils/utils.dart';
@@ -63,42 +66,38 @@ class _GameSettingPageState extends State<GameSettingPage> {
                       ),
                       SizedBox(height: 10),
                       Container(
-                        width: 326,
-                        height: 229,
-                        padding: EdgeInsets.symmetric(horizontal: 23, vertical: 20),
-                        decoration: new BoxDecoration(
-                          color: white.withOpacity(0.6),
-                          border: Border.all(color: darkGrey),
-                        ),
-                        child: GridView.builder(
-                          itemCount: wordSet.length, //item 개수
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: 2, 
-                            mainAxisSpacing: 10, //수평 Padding
-                            crossAxisSpacing: 20, 
-                            childAspectRatio: 130/30//수직 Padding
+                          width: 326,
+                          height: 229,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 23, vertical: 20),
+                          decoration: new BoxDecoration(
+                            color: white.withOpacity(0.6),
+                            border: Border.all(color: darkGrey),
                           ),
-                          itemBuilder: (BuildContext context, int index) {
-                            final List<String> wordList = wordSet.toList();
-                            return Container(
-                              width: 130,
-                              height: 30,
-                              alignment: Alignment.center,
-                              decoration: new BoxDecoration(
-                                border: Border.all(color: darkGrey),
-                                borderRadius: BorderRadius.all(Radius.circular(20.0))
-                               
-                              ),
-                              child:Container(
-                                child: Text(
-                                  wordList[index],
-                                  style: body2style()
-                                ),
-                              )
-                            );
-                          }
-                        )
-                      ),
+                          child: GridView.builder(
+                              itemCount: wordSet.length, //item 개수
+                              gridDelegate:
+                                  SliverGridDelegateWithFixedCrossAxisCount(
+                                      crossAxisCount: 2,
+                                      mainAxisSpacing: 10, //수평 Padding
+                                      crossAxisSpacing: 20,
+                                      childAspectRatio: 130 / 30 //수직 Padding
+                                      ),
+                              itemBuilder: (BuildContext context, int index) {
+                                final List<String> wordList = wordSet.toList();
+                                return Container(
+                                    width: 130,
+                                    height: 30,
+                                    alignment: Alignment.center,
+                                    decoration: new BoxDecoration(
+                                        border: Border.all(color: darkGrey),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(20.0))),
+                                    child: Container(
+                                      child: Text(wordList[index],
+                                          style: body2style()),
+                                    ));
+                              })),
                       TextButton(
                           onPressed: () {
                             setState(() {
@@ -173,17 +172,34 @@ class _GameSettingPageState extends State<GameSettingPage> {
                 ]),
               ),
               SizedBox(height: 50),
-              mediumButtonTheme('방 만들기', () {
-                //generate entrance code as document id
-                //need to make a new game room stream
-                //what are preparations needed?
-                //go to game zone
-                print(wordSet);
-                print(_currentlySelected);
-              })
+              mediumButtonTheme('방 만들기', makeNewGame)
             ],
           ),
         ));
+  }
+
+  void makeNewGame() async {
+    try {
+      String code = random.nextInt(9999).toString();
+
+      //need to make a new game room stream
+      Game newGame = Game();
+      newGame.code = code;
+      newGame.host = currentPlayer.uid;
+      newGame.playerCount = 1;
+      newGame.playerLimit = _currentlySelected;
+      newGame.players = [currentPlayer.uid];
+      newGame.keywords = wordSet;
+      newGame.timeLimit = 60;
+      await firestoreNewGame(newGame, code);
+      //what are preparations needed?
+      //go to game zone
+      print(wordSet);
+      print(_currentlySelected);
+    } on Exception catch (e) {
+      // TODO
+      print(e);
+    }
   }
 
   void getRandomKeywords() {
