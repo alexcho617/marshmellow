@@ -13,7 +13,7 @@ class GameSettingPage extends StatefulWidget {
 }
 
 class _GameSettingPageState extends State<GameSettingPage> {
-  Set<String> wordSet = {};
+  List<String> wordSet = [];
   final List<String> _dropdownValues = ["3", "4", "5", "6", "7"];
   var _currentlySelected;
 
@@ -156,12 +156,35 @@ class _GameSettingPageState extends State<GameSettingPage> {
   }
 
   void getRandomKeywords() {
-    wordSet = {};
+    wordSet.clear();
     final random = Random();
-    for (int i = 0; i < 12; i++) {
-      var i = random.nextInt(wordRepository.length);
-      wordSet.add(wordRepository[i]);
+    int i, j = 0;
+    for (i = 0; i < 12; i++) {
+      j = random.nextInt(wordRepository.length);
+      String word = wordRepository.elementAt(j);
+      wordSet.add(word);
     }
     print(wordSet);
   }
+
+  //set version
+  // void getRandomKeywords() {
+  //   wordSet.clear();
+  //   Set<String> repository = {};
+  //   repository = wordRepository;
+  //   final random = Random();
+  //   int i, j = 0;
+
+  //   for (i = 0; i < 10; i++) {
+
+  //     j = random.nextInt(repository.length);
+  //     print('j:$j');
+  //     String word = repository.elementAt(j);
+  //     wordSet.add(word);
+  //     repository.remove(word);
+  //     print('wordRepo$wordRepository');
+  //     print('repo$repository');
+  //   }
+  //   print(wordSet);
+  // }
 }
