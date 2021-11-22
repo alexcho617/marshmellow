@@ -82,8 +82,8 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Container(
                     //Alex: OverFLow, adjust width
-                    // width: 165,
-                    width: 150,
+                    width: 165,
+                    //width: 150,
                     height: 218,
                     child: OutlinedButton(
                       child: Column(
@@ -107,8 +107,8 @@ class _HomePageState extends State<HomePage> {
                     )),
                 Container(
                     //Alex: OverFLow, adjust width
-                    // width: 165,
-                    width: 150,
+                    width: 165,
+                    //width: 150,
                     height: 218,
                     child: OutlinedButton(
                       child: Column(

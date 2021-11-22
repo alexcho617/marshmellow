@@ -63,10 +63,39 @@ class _GameSettingPageState extends State<GameSettingPage> {
                       Container(
                         width: 326,
                         height: 229,
+                        padding: EdgeInsets.symmetric(horizontal: 23, vertical: 20),
                         decoration: new BoxDecoration(
                           color: white.withOpacity(0.6),
                           border: Border.all(color: darkGrey),
                         ),
+                        child: GridView.builder(
+                          itemCount: wordSet.length, //item 개수
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2, 
+                            mainAxisSpacing: 10, //수평 Padding
+                            crossAxisSpacing: 20, 
+                            childAspectRatio: 130/30//수직 Padding
+                          ),
+                          itemBuilder: (BuildContext context, int index) {
+                            final List<String> wordList = wordSet.toList();
+                            return Container(
+                              width: 130,
+                              height: 30,
+                              alignment: Alignment.center,
+                              decoration: new BoxDecoration(
+                                border: Border.all(color: darkGrey),
+                                borderRadius: BorderRadius.all(Radius.circular(20.0))
+                               
+                              ),
+                              child:Container(
+                                child: Text(
+                                  wordList[index],
+                                  style: body2style()
+                                ),
+                              )
+                            );
+                          }
+                        )
                       ),
                       TextButton(
                           onPressed: () {
