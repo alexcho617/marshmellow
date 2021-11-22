@@ -2,8 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
+import 'package:marshmallow/utils/utils.dart';
 import 'package:marshmallow/widgets/button.dart';
 import 'package:marshmallow/widgets/userMarshInfo.dart';
+import "dart:math";
 
 class GameSettingPage extends StatefulWidget {
   @override
@@ -11,8 +13,16 @@ class GameSettingPage extends StatefulWidget {
 }
 
 class _GameSettingPageState extends State<GameSettingPage> {
+  Set<String> wordSet = {};
   final List<String> _dropdownValues = ["3", "4", "5", "6", "7"];
   var _currentlySelected;
+
+  @override
+  void initState() {
+    super.initState();
+    getRandomKeywords();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,7 +69,11 @@ class _GameSettingPageState extends State<GameSettingPage> {
                         ),
                       ),
                       TextButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            setState(() {
+                              getRandomKeywords();
+                            });
+                          },
                           child: Text(
                             '🔄 다시 뽑기',
                             style: body3style(),
@@ -127,12 +141,27 @@ class _GameSettingPageState extends State<GameSettingPage> {
                   )
                 ]),
               ),
-              // SizedBox(height:R109),
+              SizedBox(height: 50),
               mediumButtonTheme('방 만들기', () {
+                //generate entrance code as document id
+                //need to make a new game room stream
+                //what are preparations needed?
                 //go to game zone
+                print(wordSet);
+                print(_currentlySelected);
               })
             ],
           ),
         ));
+  }
+
+  void getRandomKeywords() {
+    wordSet = {};
+    final random = Random();
+    for (int i = 0; i < 12; i++) {
+      var i = random.nextInt(wordRepository.length);
+      wordSet.add(wordRepository[i]);
+    }
+    print(wordSet);
   }
 }

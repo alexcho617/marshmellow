@@ -67,6 +67,7 @@ class _HomePageState extends State<HomePage> {
                           style: body2style(),
                         ),
                       ),
+                      TextButton(onPressed: signOut, child: Text('SignOut')),
                       Spacer(),
                       UserMArshInfo(currentPlayer.globalToken ?? 0)
                     ],
@@ -80,7 +81,9 @@ class _HomePageState extends State<HomePage> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                    width: 165,
+                    //Alex: OverFLow, adjust width
+                    // width: 165,
+                    width: 150,
                     height: 218,
                     child: OutlinedButton(
                       child: Column(
@@ -103,7 +106,9 @@ class _HomePageState extends State<HomePage> {
                       },
                     )),
                 Container(
-                    width: 165,
+                    //Alex: OverFLow, adjust width
+                    // width: 165,
+                    width: 150,
                     height: 218,
                     child: OutlinedButton(
                       child: Column(
@@ -123,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                       ),
                       onPressed: () async {
                         final String currentTeam =
-                            await _asyncInputDialog(context);
+                            await _asyncInputDialog(context) ?? '';
                       },
                     ))
               ],
