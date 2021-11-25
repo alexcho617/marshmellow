@@ -1,13 +1,15 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marshmallow/models/game.dart';
-import 'package:marshmallow/screens/home/home.dart';
+import 'package:marshmallow/models/user.dart';
+import 'package:marshmallow/screens/gamezone/gamezone.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/utils/utils.dart';
 import 'package:marshmallow/widgets/button.dart';
-import 'package:marshmallow/widgets/userMarshInfo.dart';
 import "dart:math";
 
 class GameSettingPage extends StatefulWidget {
@@ -16,8 +18,11 @@ class GameSettingPage extends StatefulWidget {
 }
 
 class _GameSettingPageState extends State<GameSettingPage> {
+  GameUser currentPlayer = GameUser();
+  bool userLoaded = false;
   List<String> wordSet = [];
   final random = Random();
+  final _auth = FirebaseAuth.instance;
 
   final List<String> _dropdownValues = ["3", "4", "5", "6", "7"];
   var _currentlySelected;
@@ -26,6 +31,7 @@ class _GameSettingPageState extends State<GameSettingPage> {
   void initState() {
     super.initState();
     getRandomKeywords();
+    _getFirebaseUserData(_auth.currentUser!.uid, currentPlayer);
   }
 
   @override
@@ -194,8 +200,8 @@ class _GameSettingPageState extends State<GameSettingPage> {
       await firestoreNewGame(newGame, code);
       //what are preparations needed?
       //go to game zone
-      print(wordSet);
-      print(_currentlySelected);
+      currentPlayer.type = UserType.host;
+      Get.to(() => GameZone(), arguments: [code, currentPlayer]);
     } on Exception catch (e) {
       // TODO
       print(e);
@@ -211,6 +217,23 @@ class _GameSettingPageState extends State<GameSettingPage> {
       wordSet.add(word);
     }
     print(wordSet);
+  }
+
+  Future<void> _getFirebaseUserData(String uid, GameUser currentPlayer) async {
+    await firestore
+        .collection('Users')
+        .doc(uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      setState(() {
+        currentPlayer.id = documentSnapshot.get("id");
+        currentPlayer.avatarIndex = documentSnapshot.get("avatarIndex");
+        currentPlayer.globalToken = documentSnapshot.get("globalToken");
+        currentPlayer.localToken = documentSnapshot.get("localToken");
+        currentPlayer.uid = uid;
+        userLoaded = true;
+      });
+    });
   }
 
   // //set version

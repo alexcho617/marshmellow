@@ -4,15 +4,14 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marshmallow/models/user.dart';
 import 'package:marshmallow/screens/gameSetting/gameSetting.dart';
+import 'package:marshmallow/screens/gamezone/gamezone.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
-import 'package:marshmallow/screens/home/localwidget/enteranceCode.dart';
+import 'package:marshmallow/screens/home/localwidget/entranceCode.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/widgets/button.dart';
 import 'package:marshmallow/widgets/userMarshInfo.dart';
-
-GameUser currentPlayer = GameUser();
 
 class HomePage extends StatefulWidget {
   @override
@@ -20,6 +19,8 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  GameUser currentPlayer = GameUser();
+
   late Future<String> uid;
   final _auth = FirebaseAuth.instance;
   bool userLoaded = false;
@@ -27,7 +28,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     checkFirebaseUser();
-    getFirebaseUserData(_auth.currentUser!.uid, currentPlayer);
+    _getFirebaseUserData(_auth.currentUser!.uid, currentPlayer);
   }
 
   @override
@@ -67,12 +68,12 @@ class _HomePageState extends State<HomePage> {
                           style: body2style(),
                         ),
                       ),
-                      TextButton(onPressed: signOut, child: Text('SignOut')),
                       Spacer(),
                       UserMArshInfo(currentPlayer.globalToken ?? 0)
                     ],
                   )
                 : Text('User Loading'),
+            TextButton(onPressed: signOut, child: Text('SignOut')),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 30),
               child: Image.asset('assets/home.png'),
@@ -82,8 +83,8 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Container(
                     //Alex: OverFLow, adjust width
-                    width: 165,
-                    //width: 150,
+                    //width: 165,
+                    width: 140,
                     height: 218,
                     child: OutlinedButton(
                       child: Column(
@@ -107,8 +108,8 @@ class _HomePageState extends State<HomePage> {
                     )),
                 Container(
                     //Alex: OverFLow, adjust width
-                    width: 165,
-                    //width: 150,
+                    //width: 165,
+                    width: 140,
                     height: 218,
                     child: OutlinedButton(
                       child: Column(
@@ -155,12 +156,12 @@ class _HomePageState extends State<HomePage> {
   }
 
   void printUserData() {
-    print(currentPlayer.id);
-    print(currentPlayer.uid);
-    print(currentPlayer.avatarIndex);
-    print(currentPlayer.localToken);
-    print(currentPlayer.globalToken);
-    print(currentPlayer.type);
+    print('currentPlayer_uid: ${currentPlayer.uid}');
+    print('currentPlayer_id: ${currentPlayer.id}');
+    print('currentPlayer_type: ${currentPlayer.type}');
+    print('currentPlayer_avatarIndex: ${currentPlayer.avatarIndex}');
+    print('currentPlayer_localToken: ${currentPlayer.localToken}');
+    print('currentPlayer_globalToken: ${currentPlayer.globalToken}');
   }
 
   Future<void> signOut() async {
@@ -169,7 +170,7 @@ class _HomePageState extends State<HomePage> {
     Get.offAll(WelcomePage());
   }
 
-  Future<void> getFirebaseUserData(String uid, GameUser currentPlayer) async {
+  Future<void> _getFirebaseUserData(String uid, GameUser currentPlayer) async {
     await firestore
         .collection('Users')
         .doc(uid)
@@ -232,7 +233,20 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 SizedBox(height: 14),
-                smallButtonTheme('들어가기', () {})
+                smallButtonTheme('들어가기', () async {
+                  try {
+                    await firestoreRegisterGame(teamName, currentPlayer.uid);
+                    setState(() {
+                      currentPlayer.type = UserType.player;
+                    });
+                    Get.to(() => GameZone(),
+                        arguments: [teamName, currentPlayer]);
+                  } on Exception catch (e) {
+                    print(e);
+                    //TODO: friendlier user message
+                    print('Cannot join game');
+                  }
+                })
               ],
             ),
           ),
@@ -257,4 +271,8 @@ class _HomePageState extends State<HomePage> {
       ),
     );
   }
+
+  // _joinGame(String code, String uid) async {
+
+  // }
 }
