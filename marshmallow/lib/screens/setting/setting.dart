@@ -13,23 +13,35 @@ import 'localwidget/logoAndTitle.dart';
 // import 'package:firebase_auth/firebase_auth.dart';
 
 class WelcomePage extends StatelessWidget {
+  
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: yellow,
       body: SafeArea(
-        child: Column(children: [
-          logoAndTitle('WELCOME!'),
-          SizedBox(height: 17),
-          Text(
-            '마쉬멜로는 함께 즐기는 사물인식 게임입니다',
-            style: body2style(),
-          ),
-          SizedBox(height: 226),
-          mediumButtonTheme('다음', () {
-            Get.to(() => SettingPage());
-          })
-        ]),
+        child: Stack(
+          alignment: Alignment.topCenter,
+          children: [
+            Column(
+              children: [
+                logoAndTitle('WELCOME!'),
+                SizedBox(height: 17),
+                Text(
+                  '마쉬멜로는 함께 즐기는 사물인식 게임입니다',
+                  style: body2style(),
+                ),
+                SizedBox(height: size.height*0.2),
+              ],
+            ),
+            Positioned(
+              top: size.height*0.78,
+              child: mediumButtonTheme('다음', () {
+                Get.to(() => SettingPage());
+              })
+            ),
+          ]
+        ),
       ),
     );
   }
@@ -54,31 +66,44 @@ class _SettingPageState extends State<SettingPage> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: yellow,
         body: SafeArea(
-            child: Center(
-          child: currentState == settingState.id
-              ? Column(
+          child: Center(
+            child: currentState == settingState.id
+              ? Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                Column(
                   children: [
                     logoAndTitle('Nickname'),
                     Padding(
                       padding: const EdgeInsets.fromLTRB(42, 10, 42, 32),
                       child: TextField(
-                          controller: _idController,
-                          decoration: InputDecoration(
-                              hintText: "활동할 닉네임을 입력하세요.",
-                              hintStyle: body1style())),
+                        controller: _idController,
+                        decoration: InputDecoration(
+                          hintText: "활동할 닉네임을 입력하세요.",
+                          hintStyle: body1style())),
                     ),
                     smallButtonTheme("중복확인", performIdCheck),
                     SizedBox(height: 132),
-                    mediumButtonTheme('다음', () {
-                      Get.to(() => SettingPage());
-                    })
+                 
                   ],
-                )
-              : Column(
+                ),
+                Positioned(
+                  top: size.height*0.78,
+                  child: mediumButtonTheme('다음', () {
+                    Get.to(() => SettingPage());
+                  })
+                )   
+              ],
+              )
+              : Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                Column(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
                       logoAndTitle('Character'),
@@ -108,20 +133,25 @@ class _SettingPageState extends State<SettingPage> {
                               ],
                             ),
                           ]),
-                      SizedBox(height: 95),
-                      mediumButtonTheme('등록', () async {
-                        await signInAnonymously();
+                  ]
+                ),
+                Positioned(
+                  top: size.height*0.78,
+                  child: mediumButtonTheme('등록', () async {
+                    await signInAnonymously();
 
-                        if (_auth.currentUser == null) {
-                          print("user is null");
-                        } else {
-                          user.uid = _auth.currentUser!.uid;
-                          print('sign in confirm ${_auth.currentUser!.uid}');
-                          await firestoreAddUser(user, user.uid);
-                          Get.to(() => LandingPage(), arguments: user);
-                        }
-                      })
-                    ]),
+                    if (_auth.currentUser == null) {
+                      print("user is null");
+                    } else {
+                      user.uid = _auth.currentUser!.uid;
+                      print('sign in confirm ${_auth.currentUser!.uid}');
+                      await firestoreAddUser(user, user.uid);
+                      Get.to(() => LandingPage(), arguments: user);
+                    }
+                  })
+                )
+              ]),
+              
         )));
   }
 
