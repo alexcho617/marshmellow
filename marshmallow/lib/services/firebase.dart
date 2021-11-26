@@ -1,6 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:marshmallow/models/game.dart';
 import 'package:marshmallow/models/user.dart';
 
@@ -8,7 +7,7 @@ FirebaseFirestore firestore = FirebaseFirestore.instance;
 FirebaseAuth auth = FirebaseAuth.instance;
 
 //FIRESTORE
-//FUNCTION FOR CHECKING ID AVAILABILITY: WILL RETURN FALSE IF ID IS UNAVAILABLE
+//CHECK ID AVAILABILITY: WILL RETURN FALSE IF ID IS UNAVAILABLE
 Future<bool> firestoreTestId(String id) async {
   List ids = [];
   await firestore.collection('Users').get().then((QuerySnapshot querySnapshot) {
@@ -24,23 +23,7 @@ Future<bool> firestoreTestId(String id) async {
   }
 }
 
-// Future<void> getFirebaseUserData(String uid, GameUser currentUser) async {
-//   await firestore
-//       .collection('Users')
-//       .doc(uid)
-//       .get()
-//       .then((DocumentSnapshot documentSnapshot) {
-//     currentUser.id = documentSnapshot.get("id");
-//     currentUser.avatarIndex = documentSnapshot.get("avatarIndex");
-//     currentUser.globalToken = documentSnapshot.get("globalToken");
-//     currentUser.localToken = documentSnapshot.get("localToken");
-//     currentUser.uid = uid;
-
-//     print('GetFIrebaseUserData: ${currentUser.id}');
-//   });
-// }
-
-//FUNCTION FOR ADDING NEW USERS TO USERS COLLECTION IN FIRESTORE
+//ADD NEW USERS TO USERS COLLECTION IN FIRESTORE
 Future<void> firestoreAddUser(GameUser newUser, String uid) async {
   CollectionReference users = firestore.collection('Users');
   await users
@@ -56,6 +39,7 @@ Future<void> firestoreAddUser(GameUser newUser, String uid) async {
       .catchError((error) => print("Failed to add user: $error"));
 }
 
+//CREATE NEW GAME
 Future<void> firestoreNewGame(Game newGame, String code) async {
   CollectionReference gamerooms = firestore.collection('GameRooms');
   await gamerooms
@@ -71,15 +55,50 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
       })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to add game: $error"));
+
+  await gamerooms
+      .doc(code)
+      .collection('Records')
+      .add({'record': 'Host Created New Game'})
+      .then((value) => print("Game Added"))
+      .catchError((error) => print("Failed to initiate records: $error"));
+}
+
+//ADD NEW USER TO EXISTING GAME
+//TODO: Limit players at all?
+Future<void> firestoreRegisterGame(String code, String uid) async {
+  DocumentReference gameroom = firestore.collection('GameRooms').doc(code);
+  await gameroom.update(
+    ({
+      'players': FieldValue.arrayUnion([uid]),
+      'playerCount': FieldValue.increment(1)
+    }),
+  );
+}
+
+Future<void> _getFirebaseUserData(String uid, GameUser currentPlayer) async {
+  await firestore
+      .collection('Users')
+      .doc(uid)
+      .get()
+      .then((DocumentSnapshot documentSnapshot) {
+    currentPlayer.id = documentSnapshot.get("id");
+    currentPlayer.uid = documentSnapshot.get("uid");
+    currentPlayer.avatarIndex = documentSnapshot.get("avatarIndex");
+    currentPlayer.globalToken = documentSnapshot.get("globalToken");
+    currentPlayer.localToken = documentSnapshot.get("localToken");
+  });
 }
 
 //AUTHENTICATION
+//ANONYMOUS SIGN IN
 Future<UserCredential> signInAnonymously() async {
   UserCredential userCredential =
       await FirebaseAuth.instance.signInAnonymously();
   return userCredential;
 }
 
+//CHECK CURRENT FIREBASE USER
 Future<void> checkFirebaseUser() async {
   if (auth.currentUser != null) {
     User? loggedInUser = auth.currentUser;
@@ -89,6 +108,7 @@ Future<void> checkFirebaseUser() async {
   }
 }
 
+//RETURN FIREBASE UID
 Future<String> getFirebaseUID() async {
   if (auth.currentUser != null) {
     User? loggedInUser = auth.currentUser;

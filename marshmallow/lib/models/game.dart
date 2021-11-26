@@ -1,6 +1,7 @@
 class Game {
   Game(
-      {this.players,
+      {this.records,
+      this.players,
       this.keywords,
       this.code,
       this.host,
@@ -8,6 +9,7 @@ class Game {
       this.playerLimit,
       this.gameId,
       this.timeLimit});
+  dynamic records;
   dynamic players;
   dynamic keywords;
   dynamic code;
