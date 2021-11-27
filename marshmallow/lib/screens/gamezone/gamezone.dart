@@ -7,6 +7,9 @@ import 'package:get/get.dart';
 import 'package:marshmallow/models/user.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
 import 'package:marshmallow/services/firebase.dart';
+import 'package:marshmallow/utils/colors.dart';
+import 'package:marshmallow/utils/text.dart';
+import 'package:marshmallow/widgets/button.dart';
 
 var _getArguments = Get.arguments;
 String _code = _getArguments[0];
@@ -36,14 +39,26 @@ class _GameZoneState extends State<GameZone> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
+      backgroundColor: backgroundBlue,
       appBar: AppBar(
-        title: Text('GameZone'),
-        actions: [_isHost ? SkipButton() : Text('')],
+        backgroundColor: backgroundBlue,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            point2style(data: 'ROUND'),
+            point2style(data: (_roundNumber + 1).toString())
+          ]
+        ),
+        //actions: [_isHost ? SkipButton() : Text('')],
       ),
       body: SafeArea(
         child: Container(
-          color: Colors.amber,
+          color: backgroundBlue,
           height: 800,
           child: StreamBuilder<DocumentSnapshot>(
               stream: firestore.collection('GameRooms').doc(_code).snapshots(),
@@ -63,32 +78,47 @@ class _GameZoneState extends State<GameZone> {
                       : Map();
                   return Column(
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.menu),
-                          ),
-                          Text('Round ${_roundNumber + 1}'),
-                          SkipButton(),
-                          TextButton(
-                            child: Text('PrintUserInfo'),
-                            onPressed: printUserData,
-                          ),
-                        ],
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 35),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              alignment: Alignment.topLeft,
+                              width:66,
+                              child: IconButton(
+                                onPressed: () {},
+                                icon: Icon(Icons.menu),
+                              ),
+                            ),
+                            Container(
+                              width: 150,
+                              height: 40,
+                              alignment: Alignment.center,
+                              decoration: new BoxDecoration(
+                                color: pink,
+                                border: Border.all(color: darkGrey),
+                              ),
+                              child: Text(
+                                gameData['keywords'][_roundNumber], 
+                                style: head1style()
+                              ),
+                            ),
+                            SkipButton(),
+                            // TextButton(
+                            //   child: Text('PrintUserInfo'),
+                            //   onPressed: printUserData,
+                            // ),
+                          ],
+                        ),
                       ),
-                      Text(gameData['keywords'][_roundNumber]),
-
                       //main records stream area
                       SizedBox(
-                        height: 500,
+                        height: size.height*0.7,
                         child: RecordStream(code: _code),
                       ),
-                      TextButton(
-                        onPressed: () {},
-                        child: Text('Upload Photo'),
-                      )
+                      bigButtonTheme('📷 사진 업로드', (){}),
+                      
                     ],
                   );
                 } on Exception catch (e) {
@@ -128,20 +158,28 @@ class _GameZoneState extends State<GameZone> {
     // Get.to(WelcomePage());
     Get.offAll(WelcomePage());
   }
-
   Widget SkipButton() {
-    return TextButton(
-      onPressed: () {
-        if (_roundNumber < 11) {
-          setState(() {
-            //just make a new field in server
-            _roundNumber++;
-          });
-        }
-        print(_roundNumber);
-      },
-      child: Text(
-        'Skip',
+    return Container(
+      width: 66,
+      height: 24,
+      child: OutlinedButton(
+        child: Text('Skip', style:body4style()),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: blue,
+          side: BorderSide(color: darkGrey),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        onPressed: () {
+          if (_roundNumber < 11) {
+            setState(() {
+              //just make a new field in server
+              _roundNumber++;
+            });
+          }
+          print(_roundNumber);
+        },
       ),
     );
   }
