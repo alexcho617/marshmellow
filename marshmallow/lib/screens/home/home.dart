@@ -223,7 +223,7 @@ class _HomePageState extends State<HomePage> {
                     decoration: new InputDecoration(
                       contentPadding: EdgeInsets.zero,
                       border: InputBorder.none,
-                      hintText: '네자리 숫자를 입력하세요',
+                      hintText: '팀장에게 받은 코드를 입력하세요',
                       hintStyle: body1style(),
                     ),
                     style: body6style(),
