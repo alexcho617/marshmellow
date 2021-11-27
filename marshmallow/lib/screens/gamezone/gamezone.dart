@@ -10,6 +10,9 @@ import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/widgets/button.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:marshmallow/services/model.dart';
+import 'package:tflite/tflite.dart';
 
 var _getArguments = Get.arguments;
 String _code = _getArguments[0];
@@ -30,10 +33,15 @@ class _GameZoneState extends State<GameZone> {
   bool _isHost = false;
   late bool _userLoaded;
 
+  XFile? pickedImage;
+  List? _result = [];
+  String _name = "";
+
   @override
   void initState() {
     super.initState();
     checkFirebaseUser();
+    loadMyModel();
     _printInfo();
   }
 
@@ -112,13 +120,17 @@ class _GameZoneState extends State<GameZone> {
                           ],
                         ),
                       ),
+
                       //main records stream area
                       SizedBox(
                         height: size.height*0.7,
-                        child: RecordStream(code: _code),
+                        child: RecordStream(code: _code, name: _name),
                       ),
-                      bigButtonTheme('📷 사진 업로드', (){}),
-                      
+                      bigButtonTheme(
+                        '📷 사진 업로드', 
+                        (){getImageFromGallery();}
+                      ),
+
                     ],
                   );
                 } on Exception catch (e) {
@@ -183,11 +195,36 @@ class _GameZoneState extends State<GameZone> {
       ),
     );
   }
+
+  Future getImageFromGallery() async {
+    var tempStore = await ImagePicker().pickImage(source: ImageSource.gallery);
+    setState(() {
+      pickedImage = XFile(tempStore!.path);
+    });
+    applyModelOnImage(pickedImage);
+  }
+
+  applyModelOnImage(XFile? file) async {
+    var res = await Tflite.runModelOnImage(
+        path: file!.path,
+        numResults: 2,
+        threshold: 0.5,
+        imageMean: 127.5,
+        imageStd: 127.5);
+    setState(() {
+      _result = res;
+      print(_result);
+
+      String str = _result![0]["label"].toString();
+      _name = str;
+    });
+  }
 }
 
 class RecordStream extends StatelessWidget {
-  RecordStream({required this.code});
+  RecordStream({required this.code, required this.name});
   String code;
+  String name;
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -214,6 +251,7 @@ class RecordStream extends StatelessWidget {
                 height: 50,
                 child: ListTile(
                   title: Text(data['record']),
+                  subtitle: Text(name),
                 ),
               );
             }).toList(),
