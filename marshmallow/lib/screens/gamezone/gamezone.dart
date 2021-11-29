@@ -41,7 +41,7 @@ class _GameZoneState extends State<GameZone> {
   void initState() {
     super.initState();
     checkFirebaseUser();
-    //loadMyModel();
+    loadMyModel();
     _printInfo();
   }
 
@@ -123,7 +123,7 @@ class _GameZoneState extends State<GameZone> {
 
                       //main records stream area
                       SizedBox(
-                        height: size.height*0.7,
+                        height: size.height*0.67,
                         child: RecordStream(code: _code, name: _name),
                       ),
                       bigButtonTheme(
