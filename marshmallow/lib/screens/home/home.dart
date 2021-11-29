@@ -242,8 +242,32 @@ class _HomePageState extends State<HomePage> {
                     Get.to(() => GameZone(),
                         arguments: [teamName, currentPlayer]);
                   } on Exception catch (e) {
-                    print(e);
-                    //TODO: friendlier user message
+                    showDialog(
+                      context: context,
+                      barrierDismissible:
+                          false, // dialog is dismissible with a tap on the barrier
+                      builder: (context) {
+                        return AlertDialog(
+                          backgroundColor: yellow,
+                          shape: RoundedRectangleBorder(
+                              side: BorderSide(color: darkGrey),
+                              borderRadius: BorderRadius.all(Radius.circular(30.0))),
+                          content: Container(
+                            height:100,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                _getCloseButton(context),
+                                Text('🔐', style: head1style()),
+                                SizedBox(height:15),
+                                Text('입장코드를 다시 입력하세요.', style: body3style()),
+
+                              ],
+                            )
+                          )
+                        );
+                      }
+                    );
                     print('Cannot join game');
                   }
                 })
