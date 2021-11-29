@@ -50,7 +50,6 @@ List<String> wordRepository = [
   "beagle",
   "microphone",
   "military uniform",
-  "monitor",
   "mountain bike",
   "sunglasses",
   "table lamp",

@@ -59,7 +59,11 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
   await gamerooms
       .doc(code)
       .collection('Records')
-      .add({'record': 'Host Created New Game'})
+      .add({
+        'record': 'Host Created New Game',
+        'type': 'message',
+        'time': DateTime.now().toIso8601String(),
+      })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to initiate records: $error"));
 }

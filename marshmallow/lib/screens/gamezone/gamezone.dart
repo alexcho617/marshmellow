@@ -55,13 +55,10 @@ class _GameZoneState extends State<GameZone> {
         elevation: 0,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            point2style(data: 'ROUND'),
-            point2style(data: (_roundNumber + 1).toString())
-          ]
-        ),
+        title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
+          point2style(data: 'ROUND'),
+          point2style(data: (_roundNumber + 1).toString())
+        ]),
         //actions: [_isHost ? SkipButton() : Text('')],
       ),
       body: SafeArea(
@@ -93,7 +90,7 @@ class _GameZoneState extends State<GameZone> {
                           children: [
                             Container(
                               alignment: Alignment.topLeft,
-                              width:66,
+                              width: 66,
                               child: IconButton(
                                 onPressed: () {},
                                 icon: Icon(Icons.menu),
@@ -107,10 +104,8 @@ class _GameZoneState extends State<GameZone> {
                                 color: pink,
                                 border: Border.all(color: darkGrey),
                               ),
-                              child: Text(
-                                gameData['keywords'][_roundNumber], 
-                                style: head1style()
-                              ),
+                              child: Text(gameData['keywords'][_roundNumber],
+                                  style: head1style()),
                             ),
                             SkipButton(),
                             // TextButton(
@@ -123,14 +118,12 @@ class _GameZoneState extends State<GameZone> {
 
                       //main records stream area
                       SizedBox(
-                        height: size.height*0.67,
+                        height: size.height * 0.67,
                         child: RecordStream(code: _code, name: _name),
                       ),
-                      bigButtonTheme(
-                        '📷 사진 업로드', 
-                        (){getImageFromGallery();}
-                      ),
-
+                      bigButtonTheme('📷 사진 업로드', () {
+                        getImageFromGallery();
+                      }),
                     ],
                   );
                 } on Exception catch (e) {
@@ -170,12 +163,13 @@ class _GameZoneState extends State<GameZone> {
     // Get.to(WelcomePage());
     Get.offAll(WelcomePage());
   }
+
   Widget SkipButton() {
     return Container(
       width: 66,
       height: 24,
       child: OutlinedButton(
-        child: Text('Skip', style:body4style()),
+        child: Text('Skip', style: body4style()),
         style: OutlinedButton.styleFrom(
           backgroundColor: blue,
           side: BorderSide(color: darkGrey),
