@@ -41,7 +41,7 @@ class _GameZoneState extends State<GameZone> {
   void initState() {
     super.initState();
     checkFirebaseUser();
-    loadMyModel();
+    //loadMyModel();
     _printInfo();
   }
 
@@ -243,15 +243,17 @@ class RecordStream extends StatelessWidget {
         }
 
         try {
+          //per Records collection
           return ListView(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
+              //per document
               return Container(
                 height: 50,
                 child: ListTile(
                   title: Text(data['record']),
-                  subtitle: Text(name),
+                  subtitle: (Text('${data['type']}-${data['time']}')),
                 ),
               );
             }).toList(),
