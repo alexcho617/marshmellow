@@ -36,6 +36,7 @@ class _GameSettingPageState extends State<GameSettingPage> {
 
   @override
   Widget build(BuildContext context) {
+    var size = MediaQuery.of(context).size;
     return Scaffold(
         resizeToAvoidBottomInset: false,
         backgroundColor: backgroundBlue,
@@ -45,10 +46,10 @@ class _GameSettingPageState extends State<GameSettingPage> {
           title: Image.asset('assets/logo.png', width: 95),
         ),
         body: Container(
-          padding: EdgeInsets.symmetric(horizontal: 34),
+          alignment: Alignment.topCenter,
           child: Column(
             children: [
-              SizedBox(height: 90),
+              SizedBox(height: size.height*0.08),
               Container(
                   width: 346,
                   decoration: new BoxDecoration(
@@ -75,7 +76,7 @@ class _GameSettingPageState extends State<GameSettingPage> {
                           width: 326,
                           height: 229,
                           padding: EdgeInsets.symmetric(
-                              horizontal: 23, vertical: 20),
+                              horizontal: 23, vertical: 19),
                           decoration: new BoxDecoration(
                             color: white.withOpacity(0.6),
                             border: Border.all(color: darkGrey),
@@ -211,7 +212,7 @@ class _GameSettingPageState extends State<GameSettingPage> {
   void getRandomKeywords() {
     wordSet.clear();
     int i, j = 0;
-    for (i = 0; i < 12; i++) {
+    for (i = 0; i < 10; i++) {
       j = random.nextInt(wordRepository.length);
       String word = wordRepository[j];
       wordSet.add(word);

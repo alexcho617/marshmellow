@@ -51,7 +51,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              height: 48,
+              height: size.height*0.05,
             ),
             userLoaded
                 ? Row(
@@ -83,9 +83,9 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Container(
                     //Alex: OverFLow, adjust width
-                    //width: 165,
-                    width: 140,
-                    height: 218,
+                    width: size.width*0.4,
+                    //width: 150,
+                    height: size.width*0.53,
                     child: OutlinedButton(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -108,9 +108,9 @@ class _HomePageState extends State<HomePage> {
                     )),
                 Container(
                     //Alex: OverFLow, adjust width
-                    //width: 165,
-                    width: 140,
-                    height: 218,
+                 width: size.width*0.4,
+                    //width: 150,
+                    height: size.width*0.53,
                     child: OutlinedButton(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
