@@ -7,7 +7,6 @@ class Game {
       this.host,
       this.playerCount,
       this.playerLimit,
-      this.gameId,
       this.timeLimit});
   dynamic records;
   dynamic players;
@@ -16,6 +15,5 @@ class Game {
   dynamic host;
   dynamic playerCount;
   dynamic playerLimit;
-  dynamic gameId;
   dynamic timeLimit = 60;
 }
