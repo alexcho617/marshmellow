@@ -59,9 +59,45 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
   await gamerooms
       .doc(code)
       .collection('Records')
-      .add({'record': 'Host Created New Game'})
+      .add({
+        'record': 'Host Created New Game',
+        'type': 'message',
+        'time': DateTime.now().toIso8601String()
+      })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to initiate records: $error"));
+}
+
+Future<void> handleResult(String currentKey, String tfliteLabel, String code,
+    String playerName) async {
+  CollectionReference gamerooms = firestore.collection('GameRooms');
+
+  //sucess
+  if (currentKey == tfliteLabel) {
+    await gamerooms
+        .doc(code)
+        .collection('Records')
+        .add({
+          'record': '$playerName(이)가 정답을 맞췄습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'type': 'success',
+          'time': DateTime.now().toIso8601String()
+        })
+        .then((value) => print("Game Added"))
+        .catchError((error) => print("Failed to initiate records: $error"));
+  }
+  //fail
+  else {
+    await gamerooms
+        .doc(code)
+        .collection('Records')
+        .add({
+          'record': '$playerName(이)가 틀렸습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'type': 'failure',
+          'time': DateTime.now().toIso8601String()
+        })
+        .then((value) => print("Game Added"))
+        .catchError((error) => print("Failed to initiate records: $error"));
+  }
 }
 
 //ADD NEW USER TO EXISTING GAME
