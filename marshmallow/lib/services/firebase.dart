@@ -51,7 +51,8 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
         'playerCount': newGame.playerCount,
         'playerLimit': newGame.playerLimit,
         'timeLimit': newGame.timeLimit,
-        'players': newGame.players
+        'players': newGame.players,
+        'currentRound': newGame.curretRound
       })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to add game: $error"));
@@ -78,7 +79,8 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
         .doc(code)
         .collection('Records')
         .add({
-          'record': '$playerName(이)가 정답을 맞췄습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'record':
+              '$playerName(이)가 정답을 맞췄습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
           'type': 'success',
           'time': DateTime.now().toIso8601String()
         })
@@ -91,13 +93,21 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
         .doc(code)
         .collection('Records')
         .add({
-          'record': '$playerName(이)가 틀렸습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'record':
+              '$playerName(이)가 틀렸습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
           'type': 'failure',
           'time': DateTime.now().toIso8601String()
         })
         .then((value) => print("Game Added"))
         .catchError((error) => print("Failed to initiate records: $error"));
   }
+}
+
+Future<void> firestoreIncreaseRound(String code) async {
+  DocumentReference gameroom = firestore.collection('GameRooms').doc(code);
+  await gameroom.update(
+    ({'currentRound': FieldValue.increment(1)}),
+  );
 }
 
 //ADD NEW USER TO EXISTING GAME
@@ -124,6 +134,25 @@ Future<void> _getFirebaseUserData(String uid, GameUser currentPlayer) async {
     currentPlayer.globalToken = documentSnapshot.get("globalToken");
     currentPlayer.localToken = documentSnapshot.get("localToken");
   });
+}
+
+Future<void> getFirebaseAllUsersData(
+    List<dynamic> uids, List<GameUser> currentPlayers) async {
+  for (String uid in uids) {
+    GameUser currentPlayer = GameUser();
+    await firestore
+        .collection('Users')
+        .doc(uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      currentPlayer.id = documentSnapshot.get("id");
+      currentPlayer.uid = documentSnapshot.get("uid");
+      currentPlayer.avatarIndex = documentSnapshot.get("avatarIndex");
+      currentPlayer.globalToken = documentSnapshot.get("globalToken");
+      currentPlayer.localToken = documentSnapshot.get("localToken");
+      currentPlayers.add(currentPlayer);
+    });
+  }
 }
 
 //AUTHENTICATION

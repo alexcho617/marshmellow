@@ -3,6 +3,7 @@ class Game {
       {this.records,
       this.players,
       this.keywords,
+      this.curretRound,
       this.code,
       this.host,
       this.playerCount,
@@ -11,6 +12,7 @@ class Game {
   dynamic records;
   dynamic players;
   dynamic keywords;
+  dynamic curretRound;
   dynamic code;
   dynamic host;
   dynamic playerCount;
