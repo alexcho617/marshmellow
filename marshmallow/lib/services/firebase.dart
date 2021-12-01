@@ -52,7 +52,7 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
         'playerLimit': newGame.playerLimit,
         'timeLimit': newGame.timeLimit,
         'players': newGame.players,
-        'currentRound': newGame.curretRound
+        'currentRound': newGame.currentRound
       })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to add game: $error"));

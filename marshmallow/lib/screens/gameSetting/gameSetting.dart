@@ -198,7 +198,7 @@ class _GameSettingPageState extends State<GameSettingPage> {
       newGame.players = [currentPlayer.uid];
       newGame.keywords = wordSet;
       newGame.timeLimit = 60;
-      newGame.curretRound = 1;
+      newGame.currentRound = 1;
       await firestoreNewGame(newGame, code);
       //what are preparations needed?
       //go to game zone
