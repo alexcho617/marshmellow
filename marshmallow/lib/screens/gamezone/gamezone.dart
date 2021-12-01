@@ -17,7 +17,6 @@ import 'package:tflite/tflite.dart';
 var _getArguments = Get.arguments;
 String _code = _getArguments[0];
 GameUser _currentPlayer = _getArguments[1];
-var _roundNumber = 0;
 
 class GameZone extends StatefulWidget {
   GameZone({Key? key}) : super(key: key);
@@ -32,7 +31,6 @@ class _GameZoneState extends State<GameZone> {
   final firestore = FirebaseFirestore.instance;
   bool _isHost = false;
   late bool _userLoaded;
-
   XFile? pickedImage;
   List? _result = [];
   String _name = "";
@@ -47,6 +45,8 @@ class _GameZoneState extends State<GameZone> {
 
   @override
   Widget build(BuildContext context) {
+    List<GameUser> allPlayersInfoList = [];
+    List<String> allPlayersUID = [];
     var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: backgroundBlue,
@@ -55,16 +55,15 @@ class _GameZoneState extends State<GameZone> {
         elevation: 0,
         automaticallyImplyLeading: false,
         centerTitle: true,
-        title: Row(mainAxisAlignment: MainAxisAlignment.center, children: [
-          point2style(data: 'ROUND'),
-          point2style(data: (_roundNumber + 1).toString())
-        ]),
-        //actions: [_isHost ? SkipButton() : Text('')],
+        title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [point2style(data: 'GAMEZONE')]),
       ),
       body: SafeArea(
         child: Container(
           color: backgroundBlue,
           height: 800,
+          //MAIN STREAM
           child: StreamBuilder<DocumentSnapshot>(
               stream: firestore.collection('GameRooms').doc(_code).snapshots(),
               builder: (BuildContext context,
@@ -92,7 +91,20 @@ class _GameZoneState extends State<GameZone> {
                               alignment: Alignment.topLeft,
                               width: 66,
                               child: IconButton(
-                                onPressed: () {},
+                                onPressed: () async {
+                                  allPlayersUID = [];
+                                  allPlayersInfoList = [];
+                                  //DRAWER
+                                  // for (var uid in gameData['players']) {
+                                  //   allPlayersUID.add(uid);
+                                  // }
+                                  //GET PLAYER INFO
+                                  await getFirebaseAllUsersData(
+                                      gameData['players'], allPlayersInfoList);
+                                  for (var player in allPlayersInfoList) {
+                                    print('${player.id} ${player.avatarIndex}');
+                                  }
+                                },
                                 icon: Icon(Icons.menu),
                               ),
                             ),
@@ -104,30 +116,35 @@ class _GameZoneState extends State<GameZone> {
                                 color: pink,
                                 border: Border.all(color: darkGrey),
                               ),
-                              child: Text(gameData['keywords'][_roundNumber],
+                              child: Text(
+                                  gameData['keywords']
+                                      [gameData['currentRound'] - 1],
                                   style: head1style()),
                             ),
-                            SkipButton(),
-                            // TextButton(
-                            //   child: Text('PrintUserInfo'),
-                            //   onPressed: printUserData,
-                            // ),
+                            //TODO HOST CHECKING
+                            SkipButton(gameData['currentRound']),
                           ],
                         ),
                       ),
-
-                      //main records stream area
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            point2style(data: 'ROUND '),
+                            point2style(
+                                data: gameData['currentRound'].toString())
+                          ]),
+                      //RECORDS STREAM
                       SizedBox(
-                        height: size.height * 0.67,
+                        height: size.height * 0.62,
                         child: RecordStream(code: _code, name: _name),
                       ),
                       bigButtonTheme('📷 사진 업로드', () {
-                        getImageFromGallery(gameData['keywords'][_roundNumber]);
+                        getImageFromGallery(
+                            gameData['keywords'][gameData['currentRound'] - 1]);
                       }),
                     ],
                   );
                 } on Exception catch (e) {
-                  // TODO
                   return Center(
                     child: Text(' '),
                   );
@@ -160,11 +177,10 @@ class _GameZoneState extends State<GameZone> {
 
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
-    // Get.to(WelcomePage());
     Get.offAll(WelcomePage());
   }
 
-  Widget SkipButton() {
+  Widget SkipButton(int currentRound) {
     return Container(
       width: 66,
       height: 24,
@@ -177,14 +193,12 @@ class _GameZoneState extends State<GameZone> {
             borderRadius: BorderRadius.circular(14),
           ),
         ),
-        onPressed: () {
-          if (_roundNumber < 11) {
-            setState(() {
-              //just make a new field in server
-              _roundNumber++;
-            });
+        onPressed: () async {
+          if (currentRound < 10) {
+            await firestoreIncreaseRound(_code);
+          } else {
+            //TODO GO TO RESULT
           }
-          print(_roundNumber);
         },
       ),
     );
@@ -192,14 +206,16 @@ class _GameZoneState extends State<GameZone> {
 
   Future getImageFromGallery(String currentKey) async {
     var tempStore = await ImagePicker().pickImage(source: ImageSource.gallery);
-    setState(() {
-      pickedImage = XFile(tempStore!.path);
-    });
-    await applyModelOnImage(pickedImage);
+    if (tempStore != null) {
+      setState(() {
+        pickedImage = XFile(tempStore.path);
+      });
+      await applyModelOnImage(pickedImage);
 
-    //call resultfunction
-    // print('$currentKey, $_name');
-    handleResult(currentKey, _name, _code, _currentPlayer.id);
+      handleResult(currentKey, _name, _code, _currentPlayer.id);
+    } else {
+      return 0;
+    }
   }
 
   applyModelOnImage(XFile? file) async {
@@ -217,6 +233,20 @@ class _GameZoneState extends State<GameZone> {
       _name = str;
     });
   }
+
+  Future<void> _setFirebaseRound(_roundNumber) async {
+    print('setFirebaseROund CALLED');
+    await firestore
+        .collection('GameRooms')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        _roundNumber = doc["currentRound"];
+
+        print('roundNumber INITIATE:$_roundNumber');
+      });
+    });
+  }
 }
 
 class RecordStream extends StatelessWidget {
@@ -230,6 +260,7 @@ class RecordStream extends StatelessWidget {
           .collection('GameRooms')
           .doc(code)
           .collection('Records')
+          .orderBy('time')
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -241,14 +272,14 @@ class RecordStream extends StatelessWidget {
         }
 
         try {
-          //per Records collection
           return ListView(
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
               //per document
               return Container(
-                height: 50,
+                margin: EdgeInsets.all(4),
+                height: 60,
                 child: ListTile(
                   title: Text(data['record']),
                   subtitle: (Text('${data['type']}-${data['time']}')),
