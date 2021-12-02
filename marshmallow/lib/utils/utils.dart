@@ -39,11 +39,9 @@ List<String> wordRepository = [
   "Persian cat", //o
   "dumbbell",
   "electric guitar",
-  "espresso maker",
   "fountain", //o
   "golf ball",
   "hand blower",
-  "beagle",
   "microphone", //o
   "military uniform",
   "pool table",
