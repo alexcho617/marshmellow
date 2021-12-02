@@ -68,6 +68,41 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
       .catchError((error) => print("Failed to initiate records: $error"));
 }
 
+Future<void> handleResult(String currentKey, String tfliteLabel, String code,
+    String playerName, String playerUid) async {
+  CollectionReference gamerooms = firestore.collection('GameRooms');
+
+  //sucess
+  if (currentKey == tfliteLabel) {
+    await gamerooms
+        .doc(code)
+        .collection('Records')
+        .add({
+          'record':
+              '$playerName(이)가 정답을 맞췄습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'type': 'success',
+          'time': DateTime.now().toIso8601String()
+        })
+        .then((value) => print("Game Added"))
+        .catchError((error) => print("Failed to initiate records: $error"));
+    plusLocalMarsh(playerUid);
+  }
+  //fail
+  else {
+    await gamerooms
+        .doc(code)
+        .collection('Records')
+        .add({
+          'record':
+              '$playerName(이)가 틀렸습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'type': 'failure',
+          'time': DateTime.now().toIso8601String()
+        })
+        .then((value) => print("Game Added"))
+        .catchError((error) => print("Failed to initiate records: $error"));
+  }
+}
+
 //ADD NEW USER TO EXISTING GAME
 //TODO: Limit players at all?
 Future<void> firestoreRegisterGame(String code, String uid) async {
@@ -120,4 +155,19 @@ Future<String> getFirebaseUID() async {
   } else {
     return 'Failed:getFirebaseUID';
   }
+}
+
+Future<void> plusLocalMarsh(String uid) async {
+  int localToken = 0;
+  CollectionReference users = firestore.collection('Users');
+  await users.doc(uid).get().then((DocumentSnapshot documentSnapshot) {
+    localToken = documentSnapshot.get("localToken");
+  });
+  await users
+      .doc(uid)
+      .update({
+        'localToken': localToken + 1,
+      })
+      .then((value) => print("User Added"))
+      .catchError((error) => print("Failed to add user: $error"));
 }

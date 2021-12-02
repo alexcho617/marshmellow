@@ -122,7 +122,7 @@ class _GameZoneState extends State<GameZone> {
                         child: RecordStream(code: _code, name: _name),
                       ),
                       bigButtonTheme('📷 사진 업로드', () {
-                        getImageFromGallery();
+                        getImageFromGallery(gameData['keywords'][_roundNumber]);
                       }),
                     ],
                   );
@@ -190,12 +190,17 @@ class _GameZoneState extends State<GameZone> {
     );
   }
 
-  Future getImageFromGallery() async {
+  Future getImageFromGallery(String currentKey) async {
     var tempStore = await ImagePicker().pickImage(source: ImageSource.gallery);
     setState(() {
       pickedImage = XFile(tempStore!.path);
     });
-    applyModelOnImage(pickedImage);
+    await applyModelOnImage(pickedImage);
+
+    //call resultfunction
+    // print('$currentKey, $_name');
+    handleResult(
+        currentKey, _name, _code, _currentPlayer.id, _currentPlayer.uid);
   }
 
   applyModelOnImage(XFile? file) async {
