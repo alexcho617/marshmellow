@@ -6,7 +6,6 @@ import 'package:get/get.dart';
 
 var _getArguments = Get.arguments;
 GameUser _currentPlayer = _getArguments[0];
-var index = 0;
 
 class RankingPage extends StatefulWidget {
   @override
@@ -15,12 +14,6 @@ class RankingPage extends StatefulWidget {
 
 class _RankingPageState extends State<RankingPage> {
   final firestore = FirebaseFirestore.instance;
-  @override
-  void initState() {
-    index = 0;
-    super.initState();
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -52,6 +45,7 @@ class _RankingPageState extends State<RankingPage> {
                     int myIdx = 0;
                     int myglobalToken = 0;
                     String myId = '';
+                    var index = 0;
                     for (var doc in docs) {
                       index++;
                       int globalToken = doc['globalToken'];

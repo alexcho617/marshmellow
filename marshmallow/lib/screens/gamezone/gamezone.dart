@@ -41,7 +41,7 @@ class _GameZoneState extends State<GameZone> {
   void initState() {
     super.initState();
     checkFirebaseUser();
-    loadMyModel();
+    loadImageModel();
     _printInfo();
   }
 
