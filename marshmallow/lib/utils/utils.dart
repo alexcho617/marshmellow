@@ -12,53 +12,43 @@ List avatarRepository = [
 
 List<String> wordRepository = [
   "goldfish",
-  "cock",
-  "ostrich",
-  "bulbul",
-  "magpie",
+  "cock", //o
+  "ostrich", //o
+  "bulbul", //o
+  "magpie", //o
   "kite",
-  "bald eagle",
-  "scorpion",
+  "bald eagle", //o
+  "scorpion", //o
   "axolotl",
-  "flamingo",
+  "flamingo", //o
   "triceratops",
-  "Indian cobra",
   "centipede",
-  "goose",
+  "goose", //o
   "jellyfish",
-  "snail",
   "pelican",
-  "killer whale",
-  "zebra",
-  "church",
-  "coffeepot",
+  "killer whale", //o
+  "zebra", //o
+  "church", //o
+  "coffeepot", //o
   "crane",
-  "digital clock",
-  "golden retriever",
+  "digital clock", //o
   "standard poodle",
-  "Maltese dog",
-  "Shih-Tzu",
-  "Persian cat",
+  "Maltese dog", //o
+  "Persian cat", //o
   "dumbbell",
   "electric guitar",
-  "espresso maker",
-  "fire screen",
-  "fountain",
-  "golf ball",
-  "grand piano",
+  "fountain", //o
+  "golf ball", //o
   "hand blower",
-  "beagle",
-  "microphone",
-  "military uniform",
-  "monitor",
-  "mountain bike",
+  "microphone", //o
+  "pool table", //o
   "sunglasses",
-  "table lamp",
+  "table lamp", //o
   "violin",
-  "traffic light",
+  "traffic light", //o
   "strawberry",
   "pineapple",
   "pizza",
-  "toilet tissue",
-  "analog clock",
+  "toilet tissue", //o
+  "analog clock", //o
 ];

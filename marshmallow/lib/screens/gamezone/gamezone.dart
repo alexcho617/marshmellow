@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -7,14 +8,16 @@ import 'package:get/get.dart';
 import 'package:marshmallow/models/user.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
 import 'package:marshmallow/services/firebase.dart';
+import 'package:marshmallow/utils/colors.dart';
+import 'package:marshmallow/utils/text.dart';
+import 'package:marshmallow/widgets/button.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:marshmallow/services/model.dart';
+import 'package:marshmallow/services/models.dart';
 import 'package:tflite/tflite.dart';
 
 var _getArguments = Get.arguments;
 String _code = _getArguments[0];
 GameUser _currentPlayer = _getArguments[1];
-var _roundNumber = 0;
 
 class GameZone extends StatefulWidget {
   GameZone({Key? key}) : super(key: key);
@@ -24,15 +27,16 @@ class GameZone extends StatefulWidget {
 }
 
 class _GameZoneState extends State<GameZone> {
+  final player = AudioCache();
   late Future<String> uid;
   final _auth = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
   bool _isHost = false;
   late bool _userLoaded;
-
   XFile? pickedImage;
   List? _result = [];
   String _name = "";
+  static List<GameUser> globalAllPlayersInfoList = [];
 
   @override
   void initState() {
@@ -44,15 +48,30 @@ class _GameZoneState extends State<GameZone> {
 
   @override
   Widget build(BuildContext context) {
+    // List<GameUser> allPlayersInfoList = [];
+    // List<String> allPlayersUID = [];
+
+    var scaffoldKey = GlobalKey<ScaffoldState>();
+    var size = MediaQuery.of(context).size;
     return Scaffold(
+      key: scaffoldKey,
+      backgroundColor: backgroundBlue,
       appBar: AppBar(
-        title: Text('GameZone'),
-        actions: [_isHost ? SkipButton() : Text('')],
+        backgroundColor: backgroundBlue,
+        elevation: 0,
+        automaticallyImplyLeading: false,
+        centerTitle: true,
+        title: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [point2style(data: 'GAMEZONE')]),
       ),
+      drawer: PlayerDrawer(code: _code),
+
       body: SafeArea(
         child: Container(
-          color: Colors.amber,
+          color: backgroundBlue,
           height: 800,
+          //MAIN STREAM
           child: StreamBuilder<DocumentSnapshot>(
               stream: firestore.collection('GameRooms').doc(_code).snapshots(),
               builder: (BuildContext context,
@@ -72,36 +91,65 @@ class _GameZoneState extends State<GameZone> {
                   return Column(
                     children: [
                       Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          IconButton(
-                            onPressed: () {},
-                            icon: Icon(Icons.menu),
-                          ),
-                          Text('Round ${_roundNumber + 1}'),
-                          SkipButton(),
-                          TextButton(
-                            child: Text('PrintUserInfo'),
-                            onPressed: printUserData,
-                          ),
-                        ],
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            point2style(data: 'ROUND '),
+                            point2style(
+                                data: gameData['currentRound'].toString())
+                          ]),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 35),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Container(
+                              alignment: Alignment.topLeft,
+                              width: 66,
+                              child: IconButton(
+                                onPressed: () async {
+                                  scaffoldKey.currentState!.openDrawer();
+
+                                },
+                                icon: Icon(Icons.menu),
+                              ),
+                            ),
+                            Container(
+                              width: 150,
+                              height: 40,
+                              alignment: Alignment.center,
+                              decoration: new BoxDecoration(
+                                color: pink,
+                                border: Border.all(color: darkGrey),
+                              ),
+                              child: Text(
+                                  gameData['keywords']
+                                      [gameData['currentRound'] - 1],
+                                  style: head1style()),
+                            ),
+                            //TODO HOST CHECKING
+                            SkipButton(gameData['currentRound']),
+                          ],
+                        ),
                       ),
-                      Text(gameData['keywords'][_roundNumber]),
-                      //main records stream area
-                      SizedBox(
-                        height: 500,
-                        child: RecordStream(code: _code, name: _name),
+                      
+                      //RECORDS STREAM
+                      Padding(
+                        padding:EdgeInsets.symmetric(horizontal: size.width*0.1),
+                        child: SizedBox(
+                          
+                           
+                          height: size.height * 0.67,
+                          child: RecordStream(code: _code, name: _name),
+                        ),
                       ),
-                      TextButton(
-                        onPressed: () {
-                          getImageFromGallery();
-                        },
-                        child: Text('Upload Photo'),
-                      )
+                      Spacer(),
+                      bigButtonTheme('📷 사진 업로드', () {
+                        getImageFromGallery(
+                            gameData['keywords'][gameData['currentRound'] - 1]);
+                      }),
                     ],
                   );
                 } on Exception catch (e) {
-                  // TODO
                   return Center(
                     child: Text(' '),
                   );
@@ -132,35 +180,57 @@ class _GameZoneState extends State<GameZone> {
     print('currentPlayer_globalToken: ${_currentPlayer.globalToken}');
   }
 
+  void playSound(String filename) {
+    player.play('sounds/$filename');
+  }
+
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
-    // Get.to(WelcomePage());
     Get.offAll(WelcomePage());
   }
 
-  Widget SkipButton() {
-    return TextButton(
-      onPressed: () {
-        if (_roundNumber < 11) {
-          setState(() {
-            //just make a new field in server
-            _roundNumber++;
-          });
-        }
-        print(_roundNumber);
-      },
-      child: Text(
-        'Skip',
+  Widget SkipButton(int currentRound) {
+    return Container(
+      width: 66,
+      height: 24,
+      child: OutlinedButton(
+        child: Text('Skip', style: body4style()),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: blue,
+          side: BorderSide(color: darkGrey),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        onPressed: () async {
+          playSound('metalClick.wav');
+          // playSound('note1.wav');
+
+          if (currentRound < 10) {
+            //MAKE SOUND metalClick.ogg
+            await firestoreIncreaseRound(_code);
+          } else {
+            //TODO GO TO RESULT
+          }
+        },
       ),
     );
   }
 
-  Future getImageFromGallery() async {
+  Future getImageFromGallery(String currentKey) async {
     var tempStore = await ImagePicker().pickImage(source: ImageSource.gallery);
-    setState(() {
-      pickedImage = XFile(tempStore!.path);
-    });
-    applyModelOnImage(pickedImage);
+    if (tempStore != null) {
+      setState(() {
+        pickedImage = XFile(tempStore.path);
+      });
+      await applyModelOnImage(pickedImage);
+      //call resultfunction
+      // print('$currentKey, $_name');
+      handleResult(
+          currentKey, _name, _code, _currentPlayer.id, _currentPlayer.uid);
+    } else {
+      return 0;
+    }
   }
 
   applyModelOnImage(XFile? file) async {
@@ -178,12 +248,100 @@ class _GameZoneState extends State<GameZone> {
       _name = str;
     });
   }
+
+  Future<void> _setFirebaseRound(_roundNumber) async {
+    print('setFirebaseROund CALLED');
+    await firestore
+        .collection('GameRooms')
+        .get()
+        .then((QuerySnapshot querySnapshot) {
+      querySnapshot.docs.forEach((doc) {
+        _roundNumber = doc["currentRound"];
+
+        print('roundNumber INITIATE:$_roundNumber');
+      });
+    });
+  }
 }
+
+class PlayerDrawer extends StatelessWidget {
+  List<GameUser> allPlayersInfoList = [];
+  PlayerDrawer({required this.code});
+  String code;
+
+  @override
+  Widget build(BuildContext context) {
+    print('drawer build called');
+    // allPlayersUID = [];
+    // allPlayersInfoList = [];
+    return StreamBuilder<DocumentSnapshot>(
+      stream: firestore.collection('GameRooms').doc(_code).snapshots(),
+      builder:
+          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Drawer(child: Text('Something went wrong'));
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Drawer(child: CircularProgressIndicator());
+        }
+        try {
+          // print('try catch');
+          dynamic gameDoc = snapshot.data;
+          Map<String, dynamic> gameData =
+              gameDoc != null ? gameDoc.data() as Map<String, dynamic> : Map();
+
+          return FutureBuilder<List<GameUser>>(
+              future: getFutureFirebaseAllUsersData(gameData['players']),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.hasData == false) {
+                  return Drawer(
+                      child: Center(child: CircularProgressIndicator()));
+                } else if (snapshot.hasError) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Drawer(
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ),
+                  );
+                } else {
+                  List<GameUser> userList = snapshot.data;
+                  return Drawer(
+                    child: ListView.builder(
+                        itemCount: userList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              // Text(_code),
+                              Row(
+                                children: [
+                                  Text(userList[index].id.toString()),
+                                  Text(userList[index].avatarIndex.toString()),
+                                ],
+                              )
+                            ],
+                          );
+                        }),
+                  );
+                }
+              });
+        } on Exception catch (e) {
+          return Drawer(child: Text('Try Catch Err'));
+        }
+      },
+    );
+  }
+}
+
 
 class RecordStream extends StatelessWidget {
   RecordStream({required this.code, required this.name});
   String code;
   String name;
+  final player = AudioCache();
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -191,6 +349,7 @@ class RecordStream extends StatelessWidget {
           .collection('GameRooms')
           .doc(code)
           .collection('Records')
+          .orderBy('time')
           .snapshots(),
       builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
         if (snapshot.hasError) {
@@ -206,13 +365,42 @@ class RecordStream extends StatelessWidget {
             children: snapshot.data!.docs.map((DocumentSnapshot document) {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
-              return Container(
-                height: 50,
-                child: ListTile(
-                  title: Text(data['record']),
-                  subtitle: Text(name),
-                ),
-              );
+              //per document
+              if(data['type'] == 'success'){  //성공했을 때
+                
+                return Container(
+                  height:99,
+                  margin: EdgeInsets.only(top:40),
+                  alignment: Alignment.center,
+                  decoration:  BoxDecoration(
+                    color: darkGrey.withOpacity(0.1),
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all( Radius.circular(15))
+                  ),
+                  child: ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Image.asset('assets/m.png', width: 22, height: 17,),
+                    ),
+                    subtitle: Text(data['record'], textAlign: TextAlign.center,),
+                  ),
+                );
+              }
+              else { //실패했을 때
+                return Container(
+                  margin: EdgeInsets.only(bottom: 30),
+                  height:20,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    subtitle: Text(
+                      data['record'],
+                      textAlign: TextAlign.center,
+                      style: body4style()
+                    ),
+               
+                  ),
+                );
+              }
             }).toList(),
           );
         } on Exception catch (e) {

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:marshmallow/models/game.dart';
 import 'package:marshmallow/models/user.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 FirebaseAuth auth = FirebaseAuth.instance;
@@ -51,7 +52,8 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
         'playerCount': newGame.playerCount,
         'playerLimit': newGame.playerLimit,
         'timeLimit': newGame.timeLimit,
-        'players': newGame.players
+        'players': newGame.players,
+        'currentRound': newGame.currentRound
       })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to add game: $error"));
@@ -59,9 +61,59 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
   await gamerooms
       .doc(code)
       .collection('Records')
-      .add({'record': 'Host Created New Game'})
+      .add({
+        'record': '새로운 게임방이 생성되었습니다.',
+        'type': 'message',
+        'time': DateTime.now().toIso8601String(),
+      })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to initiate records: $error"));
+}
+
+Future<void> handleResult(String currentKey, String tfliteLabel, String code,
+    String playerName, String playerUid) async {
+  CollectionReference gamerooms = firestore.collection('GameRooms');
+  final player = AudioCache();
+  //sucess
+  if (currentKey == tfliteLabel) {
+  player.play('sounds/success.wav');
+    await gamerooms
+        .doc(code)
+        .collection('Records')
+        .add({
+          'record':
+              '$playerName님이 인식에 성공하여\n마시멜로를 획득하였습니다 🎉',
+              // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'type': 'success',
+          'time': DateTime.now().toIso8601String()
+        })
+        .then((value) => print("Game Added"))
+        .catchError((error) => print("Failed to initiate records: $error"));
+    plusLocalMarsh(playerUid);
+  }
+  //fail
+  else {
+    player.play('sounds/failure.wav');
+    await gamerooms
+        .doc(code)
+        .collection('Records')
+        .add({
+          'record':
+              '$playerName님이 인식에 실패했습니다.',
+              // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'type': 'failure',
+          'time': DateTime.now().toIso8601String()
+        })
+        .then((value) => print("Game Added"))
+        .catchError((error) => print("Failed to initiate records: $error"));
+  }
+}
+
+Future<void> firestoreIncreaseRound(String code) async {
+  DocumentReference gameroom = firestore.collection('GameRooms').doc(code);
+  await gameroom.update(
+    ({'currentRound': FieldValue.increment(1)}),
+  );
 }
 
 //ADD NEW USER TO EXISTING GAME
@@ -90,6 +142,45 @@ Future<void> _getFirebaseUserData(String uid, GameUser currentPlayer) async {
   });
 }
 
+Future<void> getFirebaseAllUsersData(
+    List<dynamic> uids, List<GameUser> currentPlayers) async {
+  for (String uid in uids) {
+    GameUser currentPlayer = GameUser();
+    await firestore
+        .collection('Users')
+        .doc(uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      currentPlayer.id = documentSnapshot.get("id");
+      currentPlayer.uid = documentSnapshot.get("uid");
+      currentPlayer.avatarIndex = documentSnapshot.get("avatarIndex");
+      currentPlayer.globalToken = documentSnapshot.get("globalToken");
+      currentPlayer.localToken = documentSnapshot.get("localToken");
+      currentPlayers.add(currentPlayer);
+    });
+  }
+}
+
+Future<List<GameUser>> getFutureFirebaseAllUsersData(List<dynamic> uids) async {
+  List<GameUser> currentPlayers = [];
+  for (String uid in uids) {
+    GameUser currentPlayer = GameUser();
+    await firestore
+        .collection('Users')
+        .doc(uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      currentPlayer.id = documentSnapshot.get("id");
+      currentPlayer.uid = documentSnapshot.get("uid");
+      currentPlayer.avatarIndex = documentSnapshot.get("avatarIndex");
+      currentPlayer.globalToken = documentSnapshot.get("globalToken");
+      currentPlayer.localToken = documentSnapshot.get("localToken");
+      currentPlayers.add(currentPlayer);
+    });
+  }
+  return currentPlayers;
+}
+
 //AUTHENTICATION
 //ANONYMOUS SIGN IN
 Future<UserCredential> signInAnonymously() async {
@@ -116,4 +207,19 @@ Future<String> getFirebaseUID() async {
   } else {
     return 'Failed:getFirebaseUID';
   }
+}
+
+Future<void> plusLocalMarsh(String uid) async {
+  int localToken = 0;
+  CollectionReference users = firestore.collection('Users');
+  await users.doc(uid).get().then((DocumentSnapshot documentSnapshot) {
+    localToken = documentSnapshot.get("localToken");
+  });
+  await users
+      .doc(uid)
+      .update({
+        'localToken': localToken + 1,
+      })
+      .then((value) => print("User Added"))
+      .catchError((error) => print("Failed to add user: $error"));
 }

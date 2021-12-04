@@ -6,12 +6,13 @@ import 'package:marshmallow/models/user.dart';
 import 'package:marshmallow/screens/gameSetting/gameSetting.dart';
 import 'package:marshmallow/screens/gamezone/gamezone.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
-import 'package:marshmallow/screens/home/localwidget/entranceCode.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/widgets/button.dart';
 import 'package:marshmallow/widgets/userMarshInfo.dart';
+import 'package:marshmallow/screens/ranking/ranking.dart';
+import 'package:marshmallow/screens/laboratory/lab.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -51,7 +52,7 @@ class _HomePageState extends State<HomePage> {
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             SizedBox(
-              height: size.height*0.05,
+              height: size.height * 0.05,
             ),
             userLoaded
                 ? Row(
@@ -73,7 +74,16 @@ class _HomePageState extends State<HomePage> {
                     ],
                   )
                 : Text('User Loading'),
-            TextButton(onPressed: signOut, child: Text('SignOut')),
+            Row(
+              children: [
+                TextButton(onPressed: signOut, child: Text('SignOut')),
+                TextButton(
+                    onPressed: () {
+                      Get.to(() => LabPage());
+                    },
+                    child: Text('MarshLab')),
+              ],
+            ),
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 30),
               child: Image.asset('assets/home.png'),
@@ -83,9 +93,9 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Container(
                     //Alex: OverFLow, adjust width
-                    width: size.width*0.4,
+                    width: size.width * 0.4,
                     //width: 150,
-                    height: size.width*0.53,
+                    height: size.width * 0.53,
                     child: OutlinedButton(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -108,9 +118,9 @@ class _HomePageState extends State<HomePage> {
                     )),
                 Container(
                     //Alex: OverFLow, adjust width
-                 width: size.width*0.4,
+                    width: size.width * 0.4,
                     //width: 150,
-                    height: size.width*0.53,
+                    height: size.width * 0.53,
                     child: OutlinedButton(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
@@ -145,6 +155,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               // Add your onPressed code here!
               printUserData();
+              Get.to(() => RankingPage(), arguments: [currentPlayer]);
             },
             child: Image.asset(
               'assets/trophy.png',
@@ -223,7 +234,7 @@ class _HomePageState extends State<HomePage> {
                     decoration: new InputDecoration(
                       contentPadding: EdgeInsets.zero,
                       border: InputBorder.none,
-                      hintText: '네자리 숫자를 입력하세요',
+                      hintText: '팀장에게 받은 코드를 입력하세요',
                       hintStyle: body1style(),
                     ),
                     style: body6style(),
@@ -242,8 +253,30 @@ class _HomePageState extends State<HomePage> {
                     Get.to(() => GameZone(),
                         arguments: [teamName, currentPlayer]);
                   } on Exception catch (e) {
-                    print(e);
-                    //TODO: friendlier user message
+                    showDialog(
+                        context: context,
+                        barrierDismissible:
+                            false, // dialog is dismissible with a tap on the barrier
+                        builder: (context) {
+                          return AlertDialog(
+                              backgroundColor: yellow,
+                              shape: RoundedRectangleBorder(
+                                  side: BorderSide(color: darkGrey),
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(30.0))),
+                              content: Container(
+                                  height: 100,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      _getCloseButton(context),
+                                      Text('🔐', style: head1style()),
+                                      SizedBox(height: 15),
+                                      Text('입장코드를 다시 입력하세요.',
+                                          style: body3style()),
+                                    ],
+                                  )));
+                        });
                     print('Cannot join game');
                   }
                 })
