@@ -79,6 +79,7 @@ class _GameZoneState extends State<GameZone> {
                   Map<String, dynamic> gameData = gameDoc != null
                       ? gameDoc.data() as Map<String, dynamic>
                       : Map();
+                  if(gameData['currentRound'] < 11){}
                   return Column(
                     children: [
                       Row(

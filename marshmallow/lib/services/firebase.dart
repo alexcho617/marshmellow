@@ -76,20 +76,20 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
   final player = AudioCache();
   //sucess
   if (currentKey == tfliteLabel) {
-  player.play('sounds/success.wav');
+    player.play('sounds/success.wav');
     await gamerooms
         .doc(code)
         .collection('Records')
         .add({
-          'record':
-              '$playerName님이 인식에 성공하여\n마시멜로를 획득하였습니다 🎉',
-              // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'record': '$playerName님이 인식에 성공하여\n마시멜로를 획득하였습니다 🎉',
+          // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
           'type': 'success',
           'time': DateTime.now().toIso8601String()
         })
         .then((value) => print("Game Added"))
         .catchError((error) => print("Failed to initiate records: $error"));
     plusLocalMarsh(playerUid);
+    firestoreIncreaseRound(code);
   }
   //fail
   else {
@@ -98,9 +98,8 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
         .doc(code)
         .collection('Records')
         .add({
-          'record':
-              '$playerName님이 인식에 실패했습니다.',
-              // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+          'record': '$playerName님이 인식에 실패했습니다.',
+          // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
           'type': 'failure',
           'time': DateTime.now().toIso8601String()
         })
