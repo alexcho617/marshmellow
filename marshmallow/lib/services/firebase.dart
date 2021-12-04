@@ -89,7 +89,6 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
         .then((value) => print("Game Added"))
         .catchError((error) => print("Failed to initiate records: $error"));
     plusLocalMarsh(playerUid);
-    // nextRound(code);
   }
   //fail
   else {
@@ -222,5 +221,3 @@ Future<void> plusLocalMarsh(String uid) async {
       .then((value) => print("User Added"))
       .catchError((error) => print("Failed to add user: $error"));
 }
-
-// Future<void> nextRound(String code) async {}

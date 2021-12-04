@@ -4,7 +4,6 @@ import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/services/models.dart';
 import 'package:tflite/tflite.dart';
 import 'package:camera/camera.dart';
-import 'package:marshmallow/main.dart';
 
 class LabPage extends StatefulWidget {
   @override
@@ -12,36 +11,38 @@ class LabPage extends StatefulWidget {
 }
 
 class _LabPageState extends State<LabPage> {
-  late CameraController cameraController;
-  late CameraImage cameraImage;
+  late CameraController _camera;
+  bool _cameraInitialized = false;
+  late CameraImage _savedImage;
 
-  List? _result = [];
-  initCamera() {
-    cameraController = CameraController(cameras[0], ResolutionPreset.max);
-    cameraController.initialize().then((_) {
-      if (!mounted) {
-        return;
-      }
+  void _initializeCamera() async {
+    List<CameraDescription> cameras = await availableCameras();
+    _camera = new CameraController(cameras[0], ResolutionPreset.veryHigh);
+    _camera.initialize().then((_) async {
+      await _camera
+          .startImageStream((CameraImage image) => _processCameraImage(image));
       setState(() {
-        cameraController.startImageStream((image) => {
-              cameraImage = image,
-              applyModelOnCamera(),
-            });
+        _cameraInitialized = true;
       });
+    });
+  }
+
+  void _processCameraImage(CameraImage image) async {
+    setState(() {
+      _savedImage = image;
     });
   }
 
   @override
   void initState() {
     loadModel(1);
-    initCamera();
+    _initializeCamera();
     super.initState();
   }
 
   @override
   void dispose() {
-    cameraController.stopImageStream();
-
+    _camera.stopImageStream();
     super.dispose();
   }
 
@@ -59,25 +60,28 @@ class _LabPageState extends State<LabPage> {
             children: [point2style(data: 'GAMEZONE')]),
       ),
       body: SafeArea(
-          child: !cameraController.value.isInitialized
+          child: !_camera.value.isInitialized
               ? Container()
-              : CameraPreview(cameraController)),
+              : AspectRatio(
+                  aspectRatio: _camera.value.aspectRatio,
+                  child: CameraPreview(_camera),
+                )),
     );
   }
 
-  applyModelOnCamera() async {
-    var res = await Tflite.detectObjectOnFrame(
-      bytesList: cameraImage.planes.map((plane) {
-        return plane.bytes;
-      }).toList(), // required
-      model: "YOLO",
-      imageHeight: cameraImage.height,
-      imageWidth: cameraImage.width,
-      numResultsPerClass: 2, // defaults to 5
-    );
-    setState(() {
-      _result = res;
-      print(_result);
-    });
-  }
+  // applyModelOnCamera() async {
+  //   var res = await Tflite.detectObjectOnFrame(
+  //     bytesList: cameraImage.planes.map((plane) {
+  //       return plane.bytes;
+  //     }).toList(), // required
+  //     model: "YOLO",
+  //     imageHeight: cameraImage.height,
+  //     imageWidth: cameraImage.width,
+  //     numResultsPerClass: 2, // defaults to 5
+  //   );
+  //   setState(() {
+  //     _result = res;
+  //     print(_result);
+  //   });
+  // }
 }
