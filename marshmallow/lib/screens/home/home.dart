@@ -46,8 +46,10 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: backgroundBlue,
         elevation: 0,
         title: Image.asset('assets/logo.png', width: 95),
+        iconTheme: IconThemeData(color: darkGrey),
       ),
       drawer: Drawer(
+
         child: ListView(
           padding: EdgeInsets.zero, 
           children: [
