@@ -160,6 +160,7 @@ class _GameZoneState extends State<GameZone> {
                     // return Center(child: Text(gameData['players'][0]));
                     return ResultPage(
                       currentPlayerUIDS: gameData['players'],
+                      currentPlayer: _currentPlayer,
                     );
                   }
                 } on Exception catch (e) {
