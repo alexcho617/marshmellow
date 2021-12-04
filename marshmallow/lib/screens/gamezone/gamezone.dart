@@ -11,7 +11,7 @@ import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/widgets/button.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:marshmallow/services/model.dart';
+import 'package:marshmallow/services/models.dart';
 import 'package:tflite/tflite.dart';
 
 var _getArguments = Get.arguments;
