@@ -213,8 +213,10 @@ class _GameZoneState extends State<GameZone> {
         pickedImage = XFile(tempStore.path);
       });
       await applyModelOnImage(pickedImage);
-
-      handleResult(currentKey, _name, _code, _currentPlayer.id);
+      //call resultfunction
+      // print('$currentKey, $_name');
+      handleResult(
+          currentKey, _name, _code, _currentPlayer.id, _currentPlayer.uid);
     } else {
       return 0;
     }
