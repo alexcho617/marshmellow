@@ -6,6 +6,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:marshmallow/models/user.dart';
+import 'package:marshmallow/screens/result/result.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
@@ -117,8 +118,11 @@ class _GameZoneState extends State<GameZone> {
                                       [gameData['currentRound'] - 1],
                                   style: head1style()),
                             ),
-                            //TODO HOST CHECKING
-                            SkipButton(gameData['currentRound']),
+                            if(_isHost) 
+                              if(gameData['currentRound']<10)
+                                SkipButton(gameData['currentRound'])
+                              else 
+                                EndButton(gameData['players'])
                           ],
                         ),
                       ),
@@ -202,6 +206,30 @@ class _GameZoneState extends State<GameZone> {
           } else {
             //TODO GO TO RESULT
           }
+        },
+      ),
+    );
+  }
+  Widget EndButton(List<dynamic> currentPlayersUID) {
+    return Container(
+      width: 66,
+      height: 24,
+      child: OutlinedButton(
+        child: Text('End', style: body4style()),
+        style: OutlinedButton.styleFrom(
+          backgroundColor: blue,
+          side: BorderSide(color: darkGrey),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(14),
+          ),
+        ),
+        onPressed: () async {
+          //different ending sound
+          playSound('metalClick.wav');
+          // Get.off(ResultPage(),arguments: currentPlayersUID);
+          Get.to(ResultPage(),arguments: currentPlayersUID);
+
+
         },
       ),
     );
