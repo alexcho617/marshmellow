@@ -8,8 +8,7 @@ loadModel(int modelIdx) async {
         model:
             "assets/lite-model_imagenet_mobilenet_v3_small_100_224_classification_5_metadata_1.tflite");
   } else if (modelIdx == 1) {
-    resultant = await Tflite.loadModel(
-        model: "assets/lite-model_yolo-v5-tflite_tflite_model_1.tflite");
+    resultant = await Tflite.loadModel(model: "assets/tiny_yolo.tflite");
   }
   print("Result after loading model: $resultant");
 }

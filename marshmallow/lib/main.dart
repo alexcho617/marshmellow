@@ -13,13 +13,14 @@ import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/screens/home/home.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
-
 import 'package:marshmallow/screens/landing/landing.dart';
+import 'package:camera/camera.dart';
 
+late List<CameraDescription> cameras;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await firebase_core.Firebase.initializeApp();
-
+  cameras = await availableCameras();
   runApp(MyApp());
 }
 
