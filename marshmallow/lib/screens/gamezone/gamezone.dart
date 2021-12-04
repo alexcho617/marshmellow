@@ -1,5 +1,6 @@
 // ignore_for_file: unused_field
 
+import 'package:audioplayers/audioplayers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -26,6 +27,7 @@ class GameZone extends StatefulWidget {
 }
 
 class _GameZoneState extends State<GameZone> {
+  final player = AudioCache();
   late Future<String> uid;
   final _auth = FirebaseAuth.instance;
   final firestore = FirebaseFirestore.instance;
@@ -215,6 +217,10 @@ class _GameZoneState extends State<GameZone> {
     print('currentPlayer_globalToken: ${_currentPlayer.globalToken}');
   }
 
+  void playSound(String filename) {
+    player.play('sounds/$filename');
+  }
+
   Future<void> signOut() async {
     await FirebaseAuth.instance.signOut();
     Get.offAll(WelcomePage());
@@ -234,7 +240,11 @@ class _GameZoneState extends State<GameZone> {
           ),
         ),
         onPressed: () async {
+          playSound('metalClick.wav');
+          // playSound('note1.wav');
+
           if (currentRound < 10) {
+            //MAKE SOUND metalClick.ogg
             await firestoreIncreaseRound(_code);
           } else {
             //TODO GO TO RESULT
