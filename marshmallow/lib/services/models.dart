@@ -10,9 +10,6 @@ loadModel(int modelIdx) async {
   } else if (modelIdx == 1) {
     resultant = await Tflite.loadModel(
         model: "assets/lite-model_yolo-v5-tflite_tflite_model_1.tflite");
-  } else if (modelIdx == 2) {
-    resultant = await Tflite.loadModel(
-        model: "assets/lite-model_rosetta_float16_1.tflite");
   }
   print("Result after loading model: $resultant");
 }
