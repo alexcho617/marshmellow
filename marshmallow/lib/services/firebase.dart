@@ -227,6 +227,26 @@ Future<void> plusLocalMarsh(String uid) async {
       .update({
         'localToken': localToken + 1,
       })
-      .then((value) => print("User Added"))
-      .catchError((error) => print("Failed to add user: $error"));
+      .then((value) => print("plusLocalMarsh: Local Token Added"))
+      .catchError((error) =>
+          print("plusLocalMarsh: Failed to Add Local Token: $error"));
+}
+
+Future<void> updateGlobalMarsh(String uid) async {
+  int localToken = 0;
+  int globalToken = 0;
+  CollectionReference users = firestore.collection('Users');
+  await users.doc(uid).get().then((DocumentSnapshot documentSnapshot) {
+    localToken = documentSnapshot.get("localToken");
+    globalToken = documentSnapshot.get("globalToken");
+  });
+  await users
+      .doc(uid)
+      .update({
+        'globalToken': localToken + globalToken,
+        'localToken': 0,
+      })
+      .then((value) => print("updateGlobalMarsh: Global Token Updated"))
+      .catchError((error) =>
+          print("updateGlobalMarsh: Failed to Update Global Token: $error"));
 }

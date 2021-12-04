@@ -449,7 +449,7 @@ PODS:
     - Flutter
   - PromisesObjC (2.0.0)
   - TensorFlowLiteC (2.2.0)
-  - tflite (1.0.5):
+  - tflite (1.1.2):
     - Flutter
     - TensorFlowLiteC
 
@@ -525,7 +525,7 @@ SPEC CHECKSUMS:
   path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
   PromisesObjC: 68159ce6952d93e17b2dfe273b8c40907db5ba58
   TensorFlowLiteC: b3ab9e867b0b71052ca102a32a786555b330b02e
-  tflite: 9f7585b2241913a85c76a7c0154ce99669b9109d
+  tflite: 7acd11db0915e2d90ab90474413068568eb605f0
 
 PODFILE CHECKSUM: 751a61ab1bc8e2d1f5f5c0299b76eeab98db4e0c
 

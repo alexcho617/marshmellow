@@ -10,7 +10,6 @@ import 'package:marshmallow/widgets/button.dart';
 var _getArguments = Get.arguments;
 GameUser _currentPlayer = _getArguments[0];
 
-
 class RankingPage extends StatefulWidget {
   @override
   _RankingPageState createState() => _RankingPageState();
@@ -18,7 +17,6 @@ class RankingPage extends StatefulWidget {
 
 class _RankingPageState extends State<RankingPage> {
   final firestore = FirebaseFirestore.instance;
- 
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +69,8 @@ class _RankingPageState extends State<RankingPage> {
                       rankList.add(rankObject);
                     }
                     return Container(
-                      padding: EdgeInsets.symmetric(horizontal: size.width*0.08),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: size.width * 0.08),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -79,56 +78,61 @@ class _RankingPageState extends State<RankingPage> {
                             padding: EdgeInsets.symmetric(vertical: 45),
                             child: Image.asset('assets/ranking.png'),
                           ),
-
-                          Text('나의 랭킹', style: body5style(),),
+                          Text(
+                            '나의 랭킹',
+                            style: body5style(),
+                          ),
                           SizedBox(height: 11),
                           Container(
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  flex:1,
-                                  child: Text(myIdx.toString(), style: body5style()),
-                                ),
-                                Expanded(
-                                  flex:5,
-                                  child: Text(myId, style: body5style()),
-                                ),
-                                Expanded(
-                                  flex:2,
-                                  child: Image.asset('assets/m.png', height:30), 
-                                ),
-                                Expanded(
-                                  flex:1,
-                                  child: Text(myglobalToken.toString(), style: body5style()),
-                                ),
-                              ]
-                            ),
+                            child: Row(children: [
+                              Expanded(
+                                flex: 1,
+                                child:
+                                    Text(myIdx.toString(), style: body5style()),
+                              ),
+                              Expanded(
+                                flex: 5,
+                                child: Text(myId, style: body5style()),
+                              ),
+                              Expanded(
+                                flex: 2,
+                                child: Image.asset('assets/m.png', height: 30),
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: Text(myglobalToken.toString(),
+                                    style: body5style()),
+                              ),
+                            ]),
                           ),
                           Padding(
-                            padding: EdgeInsets.only(top:20, bottom: 20),
-                            child: Center(child: Image.asset('assets/dots.png', width:5)),
+                            padding: EdgeInsets.only(top: 20, bottom: 20),
+                            child: Center(
+                                child:
+                                    Image.asset('assets/dots.png', width: 5)),
                           ),
-                          Text('전체 랭킹',style: body5style(),),
+                          Text(
+                            '전체 랭킹',
+                            style: body5style(),
+                          ),
                           SizedBox(height: 20),
                           Expanded(
                             child: Container(
-                              decoration:  BoxDecoration(
-                                color: white.withOpacity(0.5),
-                                shape: BoxShape.rectangle,
-                                borderRadius: BorderRadius.all( Radius.circular(15))
-                                
-                              ),
+                              decoration: BoxDecoration(
+                                  color: white.withOpacity(0.5),
+                                  shape: BoxShape.rectangle,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(15))),
                               padding: EdgeInsets.all(15),
-                              
                               child: ListView(
                                 children: rankList,
                               ),
                             ),
                           ),
-                          SizedBox(height:20),
+                          SizedBox(height: 20),
                           Center(
                             child: mediumButtonTheme('홈으로', () {
-                              Get.off(HomePage());
+                              Get.offAll(HomePage());
                             }),
                           ),
                         ],
@@ -160,24 +164,26 @@ class _RankBuilderState extends State<RankBuilder> {
   Widget build(BuildContext context) {
     return Container(
       padding: EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        
-        children: [
+      child: Row(children: [
         Expanded(
-          flex:1,
+          flex: 1,
           child: Text(widget.index.toString(), style: body5style()),
         ),
         Expanded(
-          flex:5,
+          flex: 5,
           child: Text(widget.id, style: body5style()),
         ),
         Expanded(
-          flex:1,
-          child: Image.asset('assets/m.png', height:20), 
+          flex: 1,
+          child: Image.asset('assets/m.png', height: 20),
         ),
         Expanded(
-          flex:1,
-          child: Text(widget.globalToken.toString(), style: body5style(),textAlign: TextAlign.center,),
+          flex: 1,
+          child: Text(
+            widget.globalToken.toString(),
+            style: body5style(),
+            textAlign: TextAlign.center,
+          ),
         ),
       ]),
     );

@@ -47,6 +47,39 @@ class _HomePageState extends State<HomePage> {
         elevation: 0,
         title: Image.asset('assets/logo.png', width: 95),
       ),
+      drawer: Drawer(
+        child: ListView(
+          padding: EdgeInsets.zero, 
+          children: [
+            DrawerHeader(
+              padding: EdgeInsets.only(left: 30, bottom: 15),
+              decoration: BoxDecoration(
+                color: blue,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset('assets/m.png', width: 30),
+                  SizedBox(height: 10),
+                  point2style(data:'MARSHMALLOW', color:yellow)
+                  
+                ],
+              )
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(left: 30),
+              child: TextButton(onPressed: signOut, child: Text('SignOut',style: body1style(),textAlign: TextAlign.start,))
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(left: 30),
+              child: TextButton(onPressed: () {Get.to(() => LabPage());}, child: Text('Marsh Lab',style: body1style(),textAlign: TextAlign.start,))
+            ),
+          ]
+        )
+      ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 34),
         child: Column(
@@ -75,21 +108,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   )
                 : Text('User Loading'),
-            Row(
-              children: [
-                TextButton(onPressed: signOut, child: Text('SignOut')),
-                TextButton(
-                    onPressed: () {
-                      Get.to(() => LabPage());
-                    },
-                    child: Text('MarshLab')),
-                  TextButton(
-                    onPressed: () {
-                      // Get.to(() => ResultPage());
-                    },
-                    child: Text('Result page')),
-              ],
-            ),
+            
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 30),
               child: Image.asset('assets/home.png'),
@@ -149,7 +168,8 @@ class _HomePageState extends State<HomePage> {
                       },
                     ))
               ],
-            )
+            ),
+            
           ],
         ),
       ),

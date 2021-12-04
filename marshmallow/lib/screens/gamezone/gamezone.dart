@@ -135,6 +135,7 @@ class _GameZoneState extends State<GameZone> {
                                   SkipButton(gameData['currentRound'])
                                 else
                                   EndButton()
+                              else SizedBox(width:66)
                             ],
                           ),
                         ),
@@ -159,6 +160,7 @@ class _GameZoneState extends State<GameZone> {
                     // return Center(child: Text(gameData['players'][0]));
                     return ResultPage(
                       currentPlayerUIDS: gameData['players'],
+                      currentPlayer: _currentPlayer,
                     );
                   }
                 } on Exception catch (e) {
