@@ -10,6 +10,7 @@ import 'package:marshmallow/screens/setting/setting.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
+import 'package:marshmallow/utils/utils.dart';
 import 'package:marshmallow/widgets/button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marshmallow/services/models.dart';
@@ -56,15 +57,6 @@ class _GameZoneState extends State<GameZone> {
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: backgroundBlue,
-      appBar: AppBar(
-        backgroundColor: backgroundBlue,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [point2style(data: 'GAMEZONE')]),
-      ),
       drawer: PlayerDrawer(code: _code),
 
       body: SafeArea(
@@ -265,7 +257,6 @@ class _GameZoneState extends State<GameZone> {
 }
 
 class PlayerDrawer extends StatelessWidget {
-  List<GameUser> allPlayersInfoList = [];
   PlayerDrawer({required this.code});
   String code;
 
@@ -310,21 +301,55 @@ class PlayerDrawer extends StatelessWidget {
                 } else {
                   List<GameUser> userList = snapshot.data;
                   return Drawer(
-                    child: ListView.builder(
-                        itemCount: userList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Column(
-                            children: [
-                              // Text(_code),
-                              Row(
-                                children: [
-                                  Text(userList[index].id.toString()),
-                                  Text(userList[index].avatarIndex.toString()),
-                                ],
-                              )
-                            ],
-                          );
-                        }),
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        DrawerHeader(
+                          padding: EdgeInsets.only(left:30, bottom: 20),
+                          decoration: BoxDecoration(
+                            color: blue,
+                          ),
+                          child: Column(
+
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.asset('assets/m.png', width:30),
+                                SizedBox(height:10),
+                                Text('참여코드', style: body2style()),
+                                SizedBox(height:10),
+                                Text(code, style: head1style()),
+                           
+
+                              ],
+                            )
+                          ),
+                          SizedBox(height: 10),
+                          ListView.separated(
+                            separatorBuilder: (BuildContext context, int index) => const Divider(),
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            padding: EdgeInsets.all(8),
+                            itemCount: userList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                padding: EdgeInsets.only(left:30),
+                                height: 40,
+                                child: Row(
+                                  children: [
+                                    Image.asset(avatarRepository[userList[index].avatarIndex], height: 25),
+                                    SizedBox(width:20),
+                                    Text(userList[index].id.toString(), style: body5style(),),
+                                  ],
+                                ),
+                              
+                          
+                              );
+                            }
+                          ),
+                        
+                      ]
+                    )
                   );
                 }
               });
