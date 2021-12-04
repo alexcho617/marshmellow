@@ -135,6 +135,7 @@ class _GameZoneState extends State<GameZone> {
                                   SkipButton(gameData['currentRound'])
                                 else
                                   EndButton()
+                              else SizedBox(width:66)
                             ],
                           ),
                         ),
