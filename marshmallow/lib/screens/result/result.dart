@@ -7,69 +7,70 @@ import 'package:get/get.dart';
 import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/widgets/button.dart';
 
-var _getArguments = Get.arguments;
-var _currentPlayerUIDS = _getArguments;
-
+// var _getArguments = Get.arguments;
+// var _currentPlayerUIDS = _getArguments;
 
 class ResultPage extends StatefulWidget {
+  ResultPage({required this.currentPlayerUIDS});
+  var currentPlayerUIDS;
   @override
   _ResultPageState createState() => _ResultPageState();
 }
 
 class _ResultPageState extends State<ResultPage> {
   final firestore = FirebaseFirestore.instance;
- 
+  var currentPlayerUIDS;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    currentPlayerUIDS = widget.currentPlayerUIDS;
+  }
 
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
-    print('line 26 ${_currentPlayerUIDS.length}');
+    print('line 26 ${currentPlayerUIDS.length}');
     return Scaffold(
-      resizeToAvoidBottomInset: false,
-      backgroundColor: backgroundBlue,
-      appBar: AppBar(
+        resizeToAvoidBottomInset: false,
         backgroundColor: backgroundBlue,
-        elevation: 0,
-        title: Image.asset('assets/logo.png', width: 95),
-      ),
-      body: SafeArea(
-        
-        child: Padding(
-          padding: EdgeInsets.all(size.width*0.08),
+        appBar: AppBar(
+          backgroundColor: backgroundBlue,
+          elevation: 0,
+          title: Image.asset('assets/logo.png', width: 95),
+        ),
+        body: SafeArea(
+            child: Padding(
+          padding: EdgeInsets.all(size.width * 0.08),
           child: Column(
             children: [
               Image.asset('assets/result.png'),
               Padding(
                 padding: EdgeInsets.symmetric(vertical: 15),
-                child: point2style(data:'game over!!',color: blue),
+                child: point2style(data: 'game over!!', color: blue),
               ),
               Expanded(
                 child: Container(
-                  decoration:  BoxDecoration(
-                    color: white.withOpacity(0.5),
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all( Radius.circular(15))
-                    
-                  ),
+                  decoration: BoxDecoration(
+                      color: white.withOpacity(0.5),
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
                   padding: EdgeInsets.all(15),
                   child: ListView(
-                    //children: rankList,
-                    //children: [Text('${_currentPlayerUIDS.length}'),]
-                  ),
+                      //children: rankList,
+                      children: [
+                        Text('${currentPlayerUIDS[0]}'),
+                      ]),
                 ),
               ),
-              SizedBox(height:20),
+              SizedBox(height: 20),
               Center(
                 child: mediumButtonTheme('홈으로', () {
                   Get.off(HomePage());
                 }),
               ),
-     
             ],
           ),
-        )
-      
-      )
-    );
+        )));
   }
 }

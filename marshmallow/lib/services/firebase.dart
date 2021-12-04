@@ -53,7 +53,8 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
         'playerLimit': newGame.playerLimit,
         'timeLimit': newGame.timeLimit,
         'players': newGame.players,
-        'currentRound': newGame.currentRound
+        'currentRound': newGame.currentRound,
+        'isOver': newGame.isOver
       })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to add game: $error"));
@@ -112,6 +113,13 @@ Future<void> firestoreIncreaseRound(String code) async {
   DocumentReference gameroom = firestore.collection('GameRooms').doc(code);
   await gameroom.update(
     ({'currentRound': FieldValue.increment(1)}),
+  );
+}
+
+Future<void> firestoreSetRoundOver(String code) async {
+  DocumentReference gameroom = firestore.collection('GameRooms').doc(code);
+  await gameroom.update(
+    ({'isOver': true}),
   );
 }
 

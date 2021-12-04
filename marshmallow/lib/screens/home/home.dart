@@ -85,7 +85,7 @@ class _HomePageState extends State<HomePage> {
                     child: Text('MarshLab')),
                   TextButton(
                     onPressed: () {
-                      Get.to(() => ResultPage());
+                      // Get.to(() => ResultPage());
                     },
                     child: Text('Result page')),
               ],
@@ -205,7 +205,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future _asyncInputDialog(BuildContext context) async {
-    String teamName = '';
+    String entranceCode = '';
 
     return showDialog(
       context: context,
@@ -245,19 +245,19 @@ class _HomePageState extends State<HomePage> {
                     ),
                     style: body6style(),
                     onChanged: (value) {
-                      teamName = value;
+                      entranceCode = value;
                     },
                   ),
                 ),
                 SizedBox(height: 14),
                 smallButtonTheme('들어가기', () async {
                   try {
-                    await firestoreRegisterGame(teamName, currentPlayer.uid);
+                    await firestoreRegisterGame(entranceCode, currentPlayer.uid);
                     setState(() {
                       currentPlayer.type = UserType.player;
                     });
                     Get.to(() => GameZone(),
-                        arguments: [teamName, currentPlayer]);
+                        arguments: [entranceCode, currentPlayer]);
                   } on Exception catch (e) {
                     showDialog(
                         context: context,

@@ -17,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:marshmallow/services/models.dart';
 import 'package:tflite/tflite.dart';
 
+enum GameStatus { go, stop }
 var _getArguments = Get.arguments;
 String _code = _getArguments[0];
 GameUser _currentPlayer = _getArguments[1];
@@ -29,6 +30,7 @@ class GameZone extends StatefulWidget {
 }
 
 class _GameZoneState extends State<GameZone> {
+  GameStatus currentGameStatus = GameStatus.go;
   final player = AudioCache();
   late Future<String> uid;
   final _auth = FirebaseAuth.instance;
@@ -64,6 +66,9 @@ class _GameZoneState extends State<GameZone> {
           color: backgroundBlue,
           height: 800,
           //MAIN STREAM
+          // child: currentGameStatus == GameStatus.stop
+          //     ? Text("GAME OVER")
+          //     : StreamBuilder<DocumentSnapshot>(
           child: StreamBuilder<DocumentSnapshot>(
               stream: firestore.collection('GameRooms').doc(_code).snapshots(),
               builder: (BuildContext context,
@@ -80,71 +85,84 @@ class _GameZoneState extends State<GameZone> {
                   Map<String, dynamic> gameData = gameDoc != null
                       ? gameDoc.data() as Map<String, dynamic>
                       : Map();
-                  if(gameData['currentRound'] < 11){}
-                  return Column(
-                    children: [
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            point2style(data: 'ROUND '),
-                            point2style(
-                                data: gameData['currentRound'].toString())
-                          ]),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 35),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Container(
-                              alignment: Alignment.topLeft,
-                              width: 66,
-                              child: IconButton(
-                                onPressed: () async {
-                                  scaffoldKey.currentState!.openDrawer();
-                                },
-                                icon: Icon(Icons.menu),
-                              ),
-                            ),
-                            Container(
-                              width: 150,
-                              height: 40,
-                              alignment: Alignment.center,
-                              decoration: new BoxDecoration(
-                                color: pink,
-                                border: Border.all(color: darkGrey),
-                              ),
-                              child: Text(
-                                  gameData['keywords']
-                                      [gameData['currentRound'] - 1],
-                                  style: head1style()),
-                            ),
-                            if(_isHost) 
-                              if(gameData['currentRound']<10)
-                                SkipButton(gameData['currentRound'])
-                              else 
-                                EndButton(gameData['players'])
-                          ],
-                        ),
-                      ),
 
-                      //RECORDS STREAM
-                      Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: size.width * 0.1),
-                        child: SizedBox(
-                          height: size.height * 0.63,
-                          child: RecordStream(code: _code, name: _name),
+                  //Navigate Players Subscribed to Firebase to Result Screen
+                  if (gameData['isOver'] == false) {
+                    //call ending sequence
+                    // setState(() {
+                    // });
+                    // currentGameStatus = GameStatus.go;
+
+                    return Column(
+                      children: [
+                        Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              point2style(data: 'ROUND '),
+                              point2style(
+                                  data: gameData['currentRound'].toString())
+                            ]),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 35),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Container(
+                                alignment: Alignment.topLeft,
+                                width: 66,
+                                child: IconButton(
+                                  onPressed: () async {
+                                    scaffoldKey.currentState!.openDrawer();
+                                  },
+                                  icon: Icon(Icons.menu),
+                                ),
+                              ),
+                              Container(
+                                width: 150,
+                                height: 40,
+                                alignment: Alignment.center,
+                                decoration: new BoxDecoration(
+                                  color: pink,
+                                  border: Border.all(color: darkGrey),
+                                ),
+                                child: Text(
+                                    gameData['keywords']
+                                        [gameData['currentRound'] - 1],
+                                    style: head1style()),
+                              ),
+                              if (_isHost)
+                                if (gameData['currentRound'] < 10)
+                                  SkipButton(gameData['currentRound'])
+                                else
+                                  EndButton()
+                            ],
+                          ),
                         ),
-                      ),
-                      Spacer(),
-                      bigButtonTheme('📷 사진 업로드', () {
-                        getImageFromGallery(
-                            gameData['keywords'][gameData['currentRound'] - 1]);
-                      }),
-                    ],
-                  );
+
+                        //RECORDS STREAM
+                        Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: size.width * 0.1),
+                          child: SizedBox(
+                            height: size.height * 0.63,
+                            child: RecordStream(code: _code, name: _name),
+                          ),
+                        ),
+                        Spacer(),
+                        bigButtonTheme('📷 사진 업로드', () {
+                          getImageFromGallery(gameData['keywords']
+                              [gameData['currentRound'] - 1]);
+                        }),
+                      ],
+                    );
+                  } else {
+                    // return Center(child: Text(gameData['players'][0]));
+                    return ResultPage(
+                      currentPlayerUIDS: gameData['players'],
+                    );
+                  }
                 } on Exception catch (e) {
-                  return Center(
+                  throw Center(
                     child: Text(' '),
                   );
                 }
@@ -210,7 +228,8 @@ class _GameZoneState extends State<GameZone> {
       ),
     );
   }
-  Widget EndButton(List<dynamic> currentPlayersUID) {
+
+  Widget EndButton() {
     return Container(
       width: 66,
       height: 24,
@@ -227,9 +246,8 @@ class _GameZoneState extends State<GameZone> {
           //different ending sound
           playSound('metalClick.wav');
           // Get.off(ResultPage(),arguments: currentPlayersUID);
-          Get.to(ResultPage(),arguments: currentPlayersUID);
-
-
+          //set isOver to true
+          await firestoreSetRoundOver(_code); //make
         },
       ),
     );
@@ -267,19 +285,19 @@ class _GameZoneState extends State<GameZone> {
     });
   }
 
-  Future<void> _setFirebaseRound(_roundNumber) async {
-    print('setFirebaseROund CALLED');
-    await firestore
-        .collection('GameRooms')
-        .get()
-        .then((QuerySnapshot querySnapshot) {
-      querySnapshot.docs.forEach((doc) {
-        _roundNumber = doc["currentRound"];
+  // Future<void> _setFirebaseRound(_roundNumber) async {
+  //   print('setFirebaseROund CALLED');
+  //   await firestore
+  //       .collection('GameRooms')
+  //       .get()
+  //       .then((QuerySnapshot querySnapshot) {
+  //     querySnapshot.docs.forEach((doc) {
+  //       _roundNumber = doc["currentRound"];
 
-        print('roundNumber INITIATE:$_roundNumber');
-      });
-    });
-  }
+  //       print('roundNumber INITIATE:$_roundNumber');
+  //     });
+  //   });
+  // }
 }
 
 class PlayerDrawer extends StatelessWidget {
@@ -327,56 +345,51 @@ class PlayerDrawer extends StatelessWidget {
                 } else {
                   List<GameUser> userList = snapshot.data;
                   return Drawer(
-                    child: ListView(
-                      padding: EdgeInsets.zero,
-                      children: [
-                        DrawerHeader(
-                          padding: EdgeInsets.only(left:30, bottom: 20),
-                          decoration: BoxDecoration(
-                            color: blue,
-                          ),
-                          child: Column(
-
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      child: ListView(padding: EdgeInsets.zero, children: [
+                    DrawerHeader(
+                        padding: EdgeInsets.only(left: 30, bottom: 20),
+                        decoration: BoxDecoration(
+                          color: blue,
+                        ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Image.asset('assets/m.png', width: 30),
+                            SizedBox(height: 10),
+                            Text('참여코드', style: body2style()),
+                            SizedBox(height: 10),
+                            Text(code, style: head1style()),
+                          ],
+                        )),
+                    SizedBox(height: 10),
+                    ListView.separated(
+                        separatorBuilder: (BuildContext context, int index) =>
+                            const Divider(),
+                        scrollDirection: Axis.vertical,
+                        shrinkWrap: true,
+                        padding: EdgeInsets.all(8),
+                        itemCount: userList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Container(
+                            padding: EdgeInsets.only(left: 30),
+                            height: 40,
+                            child: Row(
                               children: [
-                                Image.asset('assets/m.png', width:30),
-                                SizedBox(height:10),
-                                Text('참여코드', style: body2style()),
-                                SizedBox(height:10),
-                                Text(code, style: head1style()),
-                           
-
-                              ],
-                            )
-                          ),
-                          SizedBox(height: 10),
-                          ListView.separated(
-                            separatorBuilder: (BuildContext context, int index) => const Divider(),
-                            scrollDirection: Axis.vertical,
-                            shrinkWrap: true,
-                            padding: EdgeInsets.all(8),
-                            itemCount: userList.length,
-                            itemBuilder: (BuildContext context, int index) {
-                              return Container(
-                                padding: EdgeInsets.only(left:30),
-                                height: 40,
-                                child: Row(
-                                  children: [
-                                    Image.asset(avatarRepository[userList[index].avatarIndex], height: 25),
-                                    SizedBox(width:20),
-                                    Text(userList[index].id.toString(), style: body5style(),),
-                                  ],
+                                Image.asset(
+                                    avatarRepository[
+                                        userList[index].avatarIndex],
+                                    height: 25),
+                                SizedBox(width: 20),
+                                Text(
+                                  userList[index].id.toString(),
+                                  style: body5style(),
                                 ),
-                              
-                          
-                              );
-                            }
-                          ),
-                        
-                      ]
-                    )
-                  );
+                              ],
+                            ),
+                          );
+                        }),
+                  ]));
                 }
               });
         } on Exception catch (e) {
