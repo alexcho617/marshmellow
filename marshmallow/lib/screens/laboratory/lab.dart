@@ -23,7 +23,7 @@ class _LabPageState extends State<LabPage> {
   void initState() {
     super.initState();
     checkFirebaseUser();
-    loadObjectModel();
+    loadModel(1);
   }
 
   @override
@@ -43,7 +43,7 @@ class _LabPageState extends State<LabPage> {
           child: Column(
         children: [
           TextButton(
-            child: Text('camera'),
+            child: Text('select'),
             onPressed: () {
               getImageFromCameraGallery(false);
             },

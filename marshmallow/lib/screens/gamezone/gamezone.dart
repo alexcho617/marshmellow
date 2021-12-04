@@ -36,12 +36,13 @@ class _GameZoneState extends State<GameZone> {
   XFile? pickedImage;
   List? _result = [];
   String _name = "";
+  static List<GameUser> globalAllPlayersInfoList = [];
 
   @override
   void initState() {
     super.initState();
     checkFirebaseUser();
-    loadImageModel();
+    loadModel(0);
     _printInfo();
   }
 
@@ -49,18 +50,48 @@ class _GameZoneState extends State<GameZone> {
   Widget build(BuildContext context) {
     List<GameUser> allPlayersInfoList = [];
     List<String> allPlayersUID = [];
+    var scaffoldKey = GlobalKey<ScaffoldState>();
     var size = MediaQuery.of(context).size;
     return Scaffold(
       backgroundColor: backgroundBlue,
-      appBar: AppBar(
-        backgroundColor: backgroundBlue,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [point2style(data: 'GAMEZONE')]),
-      ),
+      key: scaffoldKey,
+      // drawer: Drawer(
+      //   child: ListView(
+      //     padding: EdgeInsets.zero,
+      //     children: [
+      //       DrawerHeader(
+      //         decoration: BoxDecoration(
+      //           color: blue,
+      //         ),
+      //         child: Column(
+      //           children: [
+      //             Image.asset(
+      //               'assets/m.png',
+      //               width: 40
+      //             ),
+      //             Text('참여코드', style: body2style()),
+      //             Text('$_code', style: head1style()),
+      //             Text(globalAllPlayersInfoList.length.toString())
+      //           ],
+      //         ),
+      //       ),
+      //       ListView.builder(
+      //         padding: const EdgeInsets.all(8),
+      //         itemCount: globalAllPlayersInfoList.length,
+      //         itemBuilder: (BuildContext context, int index) {
+      //           print('itembuilder${globalAllPlayersInfoList.length}');
+      //           return Container(
+      //             height: 50,
+
+      //             child: Center(child: Text('${globalAllPlayersInfoList[index].id}')),
+      //           );
+      //         }
+      //       )
+
+      //     ],
+      //   ),
+      // ),
+
       body: SafeArea(
         child: Container(
           color: backgroundBlue,
@@ -84,8 +115,15 @@ class _GameZoneState extends State<GameZone> {
                       : Map();
                   return Column(
                     children: [
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            point2style(data: 'ROUND '),
+                            point2style(
+                                data: gameData['currentRound'].toString())
+                          ]),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 35),
+                        padding: EdgeInsets.symmetric(horizontal: 35),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -96,16 +134,17 @@ class _GameZoneState extends State<GameZone> {
                                 onPressed: () async {
                                   allPlayersUID = [];
                                   allPlayersInfoList = [];
-                                  //DRAWER
-                                  // for (var uid in gameData['players']) {
-                                  //   allPlayersUID.add(uid);
-                                  // }
-                                  //GET PLAYER INFO
                                   await getFirebaseAllUsersData(
                                       gameData['players'], allPlayersInfoList);
-                                  for (var player in allPlayersInfoList) {
-                                    print('${player.id} ${player.avatarIndex}');
-                                  }
+                                  setState(() {
+                                    globalAllPlayersInfoList =
+                                        allPlayersInfoList;
+                                  });
+
+                                  // for (var player in allPlayersInfoList) {
+                                  //   print('${player.id} ${player.avatarIndex}');
+                                  // }
+                                  scaffoldKey.currentState?.openDrawer();
                                 },
                                 icon: Icon(Icons.menu),
                               ),
@@ -128,17 +167,15 @@ class _GameZoneState extends State<GameZone> {
                           ],
                         ),
                       ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            point2style(data: 'ROUND '),
-                            point2style(
-                                data: gameData['currentRound'].toString())
-                          ]),
+
                       //RECORDS STREAM
-                      SizedBox(
-                        height: size.height * 0.62,
-                        child: RecordStream(code: _code, name: _name),
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: size.width * 0.1),
+                        child: SizedBox(
+                          height: size.height * 0.62,
+                          child: RecordStream(code: _code, name: _name),
+                        ),
                       ),
                       bigButtonTheme('📷 사진 업로드', () {
                         getImageFromGallery(
@@ -265,6 +302,7 @@ class RecordStream extends StatelessWidget {
   RecordStream({required this.code, required this.name});
   String code;
   String name;
+  final player = AudioCache();
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -289,14 +327,41 @@ class RecordStream extends StatelessWidget {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
               //per document
-              return Container(
-                margin: EdgeInsets.all(4),
-                height: 60,
-                child: ListTile(
-                  title: Text(data['record']),
-                  subtitle: (Text('${data['type']}-${data['time']}')),
-                ),
-              );
+              if (data['type'] == 'success') {
+                //성공했을 때
+
+                return Container(
+                  height: 99,
+                  margin: EdgeInsets.all(4),
+                  alignment: Alignment.center,
+                  decoration: BoxDecoration(
+                      color: darkGrey.withOpacity(0.1),
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
+                  child: ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Image.asset(
+                        'assets/m.png',
+                        width: 22,
+                        height: 17,
+                      ),
+                    ),
+                    subtitle: Text(
+                      data['record'],
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                );
+              } else {
+                //실패했을 때
+
+                return ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  subtitle: Text(data['record'],
+                      textAlign: TextAlign.center, style: body4style()),
+                );
+              }
             }).toList(),
           );
         } on Exception catch (e) {

@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:marshmallow/models/game.dart';
 import 'package:marshmallow/models/user.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 FirebaseAuth auth = FirebaseAuth.instance;
@@ -72,15 +73,17 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
 Future<void> handleResult(String currentKey, String tfliteLabel, String code,
     String playerName, String playerUid) async {
   CollectionReference gamerooms = firestore.collection('GameRooms');
-
+  final player = AudioCache();
   //sucess
   if (currentKey == tfliteLabel) {
+  player.play('sounds/success.wav');
     await gamerooms
         .doc(code)
         .collection('Records')
         .add({
           'record':
-              '$playerName(이)가 정답을 맞췄습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+              '$playerName님이 인식에 성공하여\n마시멜로를 획득하였습니다 🎉',
+              // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
           'type': 'success',
           'time': DateTime.now().toIso8601String()
         })
@@ -90,12 +93,14 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
   }
   //fail
   else {
+    player.play('sounds/failure.wav');
     await gamerooms
         .doc(code)
         .collection('Records')
         .add({
           'record':
-              '$playerName(이)가 틀렸습니다! currentKey:$currentKey - tfliteLabel:$tfliteLabel',
+              '$playerName님이 인식에 실패했습니다.',
+              // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
           'type': 'failure',
           'time': DateTime.now().toIso8601String()
         })
