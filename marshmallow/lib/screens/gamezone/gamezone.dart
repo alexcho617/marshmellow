@@ -47,10 +47,12 @@ class _GameZoneState extends State<GameZone> {
 
   @override
   Widget build(BuildContext context) {
-    List<GameUser> allPlayersInfoList = [];
-    List<String> allPlayersUID = [];
+    // List<GameUser> allPlayersInfoList = [];
+    // List<String> allPlayersUID = [];
+    var scaffoldKey = GlobalKey<ScaffoldState>();
     var size = MediaQuery.of(context).size;
     return Scaffold(
+      key: scaffoldKey,
       backgroundColor: backgroundBlue,
       appBar: AppBar(
         backgroundColor: backgroundBlue,
@@ -61,6 +63,7 @@ class _GameZoneState extends State<GameZone> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [point2style(data: 'GAMEZONE')]),
       ),
+      drawer: PlayerDrawer(code: _code),
       body: SafeArea(
         child: Container(
           color: backgroundBlue,
@@ -94,18 +97,7 @@ class _GameZoneState extends State<GameZone> {
                               width: 66,
                               child: IconButton(
                                 onPressed: () async {
-                                  allPlayersUID = [];
-                                  allPlayersInfoList = [];
-                                  //DRAWER
-                                  // for (var uid in gameData['players']) {
-                                  //   allPlayersUID.add(uid);
-                                  // }
-                                  //GET PLAYER INFO
-                                  await getFirebaseAllUsersData(
-                                      gameData['players'], allPlayersInfoList);
-                                  for (var player in allPlayersInfoList) {
-                                    print('${player.id} ${player.avatarIndex}');
-                                  }
+                                  scaffoldKey.currentState!.openDrawer();
                                 },
                                 icon: Icon(Icons.menu),
                               ),
@@ -256,6 +248,78 @@ class _GameZoneState extends State<GameZone> {
         print('roundNumber INITIATE:$_roundNumber');
       });
     });
+  }
+}
+
+class PlayerDrawer extends StatelessWidget {
+  List<GameUser> allPlayersInfoList = [];
+  PlayerDrawer({required this.code});
+  String code;
+
+  @override
+  Widget build(BuildContext context) {
+    print('drawer build called');
+    // allPlayersUID = [];
+    // allPlayersInfoList = [];
+    return StreamBuilder<DocumentSnapshot>(
+      stream: firestore.collection('GameRooms').doc(_code).snapshots(),
+      builder:
+          (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+        if (snapshot.hasError) {
+          return Drawer(child: Text('Something went wrong'));
+        }
+
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Drawer(child: CircularProgressIndicator());
+        }
+        try {
+          // print('try catch');
+          dynamic gameDoc = snapshot.data;
+          Map<String, dynamic> gameData =
+              gameDoc != null ? gameDoc.data() as Map<String, dynamic> : Map();
+
+          return FutureBuilder<List<GameUser>>(
+              future: getFutureFirebaseAllUsersData(gameData['players']),
+              builder: (BuildContext context, AsyncSnapshot snapshot) {
+                if (snapshot.hasData == false) {
+                  return Drawer(
+                      child: Center(child: CircularProgressIndicator()));
+                } else if (snapshot.hasError) {
+                  return Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Drawer(
+                      child: Text(
+                        'Error: ${snapshot.error}',
+                        style: TextStyle(fontSize: 15),
+                      ),
+                    ),
+                  );
+                } else {
+                  List<GameUser> userList = snapshot.data;
+                  return Drawer(
+                    child: ListView.builder(
+                        itemCount: userList.length,
+                        itemBuilder: (BuildContext context, int index) {
+                          return Column(
+                            children: [
+                              // Text(_code),
+                              Row(
+                                children: [
+                                  Text(userList[index].id.toString()),
+                                  Text(userList[index].avatarIndex.toString()),
+                                ],
+                              )
+                            ],
+                          );
+                        }),
+                  );
+                }
+              });
+        } on Exception catch (e) {
+          return Drawer(child: Text('Try Catch Err'));
+        }
+      },
+    );
   }
 }
 

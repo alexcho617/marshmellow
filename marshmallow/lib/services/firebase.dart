@@ -155,6 +155,26 @@ Future<void> getFirebaseAllUsersData(
   }
 }
 
+Future<List<GameUser>> getFutureFirebaseAllUsersData(List<dynamic> uids) async {
+  List<GameUser> currentPlayers = [];
+  for (String uid in uids) {
+    GameUser currentPlayer = GameUser();
+    await firestore
+        .collection('Users')
+        .doc(uid)
+        .get()
+        .then((DocumentSnapshot documentSnapshot) {
+      currentPlayer.id = documentSnapshot.get("id");
+      currentPlayer.uid = documentSnapshot.get("uid");
+      currentPlayer.avatarIndex = documentSnapshot.get("avatarIndex");
+      currentPlayer.globalToken = documentSnapshot.get("globalToken");
+      currentPlayer.localToken = documentSnapshot.get("localToken");
+      currentPlayers.add(currentPlayer);
+    });
+  }
+  return currentPlayers;
+}
+
 //AUTHENTICATION
 //ANONYMOUS SIGN IN
 Future<UserCredential> signInAnonymously() async {
