@@ -10,6 +10,7 @@ import 'package:marshmallow/screens/setting/setting.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
+import 'package:marshmallow/utils/utils.dart';
 import 'package:marshmallow/widgets/button.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:marshmallow/services/models.dart';
@@ -56,17 +57,7 @@ class _GameZoneState extends State<GameZone> {
     return Scaffold(
       key: scaffoldKey,
       backgroundColor: backgroundBlue,
-      appBar: AppBar(
-        backgroundColor: backgroundBlue,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [point2style(data: 'GAMEZONE')]),
-      ),
       drawer: PlayerDrawer(code: _code),
-
       body: SafeArea(
         child: Container(
           color: backgroundBlue,
@@ -108,7 +99,6 @@ class _GameZoneState extends State<GameZone> {
                               child: IconButton(
                                 onPressed: () async {
                                   scaffoldKey.currentState!.openDrawer();
-
                                 },
                                 icon: Icon(Icons.menu),
                               ),
@@ -131,14 +121,13 @@ class _GameZoneState extends State<GameZone> {
                           ],
                         ),
                       ),
-                      
+
                       //RECORDS STREAM
                       Padding(
-                        padding:EdgeInsets.symmetric(horizontal: size.width*0.1),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: size.width * 0.1),
                         child: SizedBox(
-                          
-                           
-                          height: size.height * 0.67,
+                          height: size.height * 0.63,
                           child: RecordStream(code: _code, name: _name),
                         ),
                       ),
@@ -265,7 +254,6 @@ class _GameZoneState extends State<GameZone> {
 }
 
 class PlayerDrawer extends StatelessWidget {
-  List<GameUser> allPlayersInfoList = [];
   PlayerDrawer({required this.code});
   String code;
 
@@ -310,21 +298,55 @@ class PlayerDrawer extends StatelessWidget {
                 } else {
                   List<GameUser> userList = snapshot.data;
                   return Drawer(
-                    child: ListView.builder(
-                        itemCount: userList.length,
-                        itemBuilder: (BuildContext context, int index) {
-                          return Column(
-                            children: [
-                              // Text(_code),
-                              Row(
-                                children: [
-                                  Text(userList[index].id.toString()),
-                                  Text(userList[index].avatarIndex.toString()),
-                                ],
-                              )
-                            ],
-                          );
-                        }),
+                    child: ListView(
+                      padding: EdgeInsets.zero,
+                      children: [
+                        DrawerHeader(
+                          padding: EdgeInsets.only(left:30, bottom: 20),
+                          decoration: BoxDecoration(
+                            color: blue,
+                          ),
+                          child: Column(
+
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Image.asset('assets/m.png', width:30),
+                                SizedBox(height:10),
+                                Text('참여코드', style: body2style()),
+                                SizedBox(height:10),
+                                Text(code, style: head1style()),
+                           
+
+                              ],
+                            )
+                          ),
+                          SizedBox(height: 10),
+                          ListView.separated(
+                            separatorBuilder: (BuildContext context, int index) => const Divider(),
+                            scrollDirection: Axis.vertical,
+                            shrinkWrap: true,
+                            padding: EdgeInsets.all(8),
+                            itemCount: userList.length,
+                            itemBuilder: (BuildContext context, int index) {
+                              return Container(
+                                padding: EdgeInsets.only(left:30),
+                                height: 40,
+                                child: Row(
+                                  children: [
+                                    Image.asset(avatarRepository[userList[index].avatarIndex], height: 25),
+                                    SizedBox(width:20),
+                                    Text(userList[index].id.toString(), style: body5style(),),
+                                  ],
+                                ),
+                              
+                          
+                              );
+                            }
+                          ),
+                        
+                      ]
+                    )
                   );
                 }
               });
@@ -335,7 +357,6 @@ class PlayerDrawer extends StatelessWidget {
     );
   }
 }
-
 
 class RecordStream extends StatelessWidget {
   RecordStream({required this.code, required this.name});
@@ -366,38 +387,41 @@ class RecordStream extends StatelessWidget {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
               //per document
-              if(data['type'] == 'success'){  //성공했을 때
-                
+              if (data['type'] == 'success') {
+                //성공했을 때
+
                 return Container(
-                  height:99,
-                  margin: EdgeInsets.only(top:40),
+                  height: 99,
+                  margin: EdgeInsets.only(top: 40),
                   alignment: Alignment.center,
-                  decoration:  BoxDecoration(
-                    color: darkGrey.withOpacity(0.1),
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all( Radius.circular(15))
-                  ),
+                  decoration: BoxDecoration(
+                      color: darkGrey.withOpacity(0.1),
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
                   child: ListTile(
                     title: Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: Image.asset('assets/m.png', width: 22, height: 17,),
+                      child: Image.asset(
+                        'assets/m.png',
+                        width: 22,
+                        height: 17,
+                      ),
                     ),
-                    subtitle: Text(data['record'], textAlign: TextAlign.center,),
-                  ),
-                );
-              }
-              else { //실패했을 때
-                return Container(
-                  margin: EdgeInsets.only(bottom: 30),
-                  height:20,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
                     subtitle: Text(
                       data['record'],
                       textAlign: TextAlign.center,
-                      style: body4style()
                     ),
-               
+                  ),
+                );
+              } else {
+                //실패했을 때
+                return Container(
+                  margin: EdgeInsets.only(bottom: 30),
+                  height: 20,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    subtitle: Text(data['record'],
+                        textAlign: TextAlign.center, style: body4style()),
                   ),
                 );
               }
