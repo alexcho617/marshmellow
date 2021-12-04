@@ -12,8 +12,9 @@ import 'package:marshmallow/widgets/button.dart';
 // var _currentPlayerUIDS = _getArguments;
 
 class ResultPage extends StatefulWidget {
-  ResultPage({required this.currentPlayerUIDS});
+  ResultPage({required this.currentPlayerUIDS, required this.currentPlayer});
   var currentPlayerUIDS;
+  GameUser currentPlayer;
   @override
   _ResultPageState createState() => _ResultPageState();
 }
@@ -21,11 +22,13 @@ class ResultPage extends StatefulWidget {
 class _ResultPageState extends State<ResultPage> {
   final firestore = FirebaseFirestore.instance;
   var currentPlayerUIDS;
+  late GameUser currentPlayer;
 
   @override
   void initState() {
     // TODO: implement initState
     currentPlayerUIDS = widget.currentPlayerUIDS;
+    currentPlayer = widget.currentPlayer;
   }
 
   @override
@@ -110,8 +113,9 @@ class _ResultPageState extends State<ResultPage> {
                     Padding(
                       padding: const EdgeInsets.all(30),
                       child: Center(
-                        child: mediumButtonTheme('홈으로', () {
-                          Get.off(HomePage());
+                        child: mediumButtonTheme('홈으로', () async {
+                          await updateGlobalMarsh(currentPlayer.uid);
+                          Get.offAll(HomePage());
                         }),
                       ),
                     ),
