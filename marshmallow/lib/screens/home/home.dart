@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:marshmallow/models/user.dart';
 import 'package:marshmallow/screens/gameSetting/gameSetting.dart';
 import 'package:marshmallow/screens/gamezone/gamezone.dart';
+import 'package:marshmallow/screens/result/result.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
@@ -82,6 +83,11 @@ class _HomePageState extends State<HomePage> {
                       Get.to(() => LabPage());
                     },
                     child: Text('MarshLab')),
+                  TextButton(
+                    onPressed: () {
+                      // Get.to(() => ResultPage());
+                    },
+                    child: Text('Result page')),
               ],
             ),
             Padding(
@@ -199,7 +205,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future _asyncInputDialog(BuildContext context) async {
-    String teamName = '';
+    String entranceCode = '';
 
     return showDialog(
       context: context,
@@ -239,19 +245,19 @@ class _HomePageState extends State<HomePage> {
                     ),
                     style: body6style(),
                     onChanged: (value) {
-                      teamName = value;
+                      entranceCode = value;
                     },
                   ),
                 ),
                 SizedBox(height: 14),
                 smallButtonTheme('들어가기', () async {
                   try {
-                    await firestoreRegisterGame(teamName, currentPlayer.uid);
+                    await firestoreRegisterGame(entranceCode, currentPlayer.uid);
                     setState(() {
                       currentPlayer.type = UserType.player;
                     });
                     Get.to(() => GameZone(),
-                        arguments: [teamName, currentPlayer]);
+                        arguments: [entranceCode, currentPlayer]);
                   } on Exception catch (e) {
                     showDialog(
                         context: context,
