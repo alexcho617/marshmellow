@@ -176,10 +176,11 @@ class _GameZoneState extends State<GameZone> {
                         child: SizedBox(
                           
                            
-                          height: size.height * 0.62,
+                          height: size.height * 0.67,
                           child: RecordStream(code: _code, name: _name),
                         ),
                       ),
+                      Spacer(),
                       bigButtonTheme('📷 사진 업로드', () {
                         getImageFromGallery(
                             gameData['keywords'][gameData['currentRound'] - 1]);
@@ -336,15 +337,13 @@ class RecordStream extends StatelessWidget {
                 
                 return Container(
                   height:99,
-                  margin: EdgeInsets.all(4),
+                  margin: EdgeInsets.only(top:40),
                   alignment: Alignment.center,
                   decoration:  BoxDecoration(
                     color: darkGrey.withOpacity(0.1),
                     shape: BoxShape.rectangle,
                     borderRadius: BorderRadius.all( Radius.circular(15))
-                     
                   ),
-                    
                   child: ListTile(
                     title: Padding(
                       padding: const EdgeInsets.all(5.0),
@@ -355,15 +354,18 @@ class RecordStream extends StatelessWidget {
                 );
               }
               else { //실패했을 때
-              
-                return ListTile(
-                  contentPadding: EdgeInsets.zero,
-                  subtitle: Text(
-                    data['record'],
-                    textAlign: TextAlign.center,
-                    style: body4style()
-                  ),
+                return Container(
+                  margin: EdgeInsets.only(bottom: 30),
+                  height:20,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    subtitle: Text(
+                      data['record'],
+                      textAlign: TextAlign.center,
+                      style: body4style()
+                    ),
                
+                  ),
                 );
               }
             }).toList(),

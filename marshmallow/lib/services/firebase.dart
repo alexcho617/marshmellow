@@ -62,7 +62,7 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
       .doc(code)
       .collection('Records')
       .add({
-        'record': 'Host Created New Game',
+        'record': '새로운 게임방이 생성되었습니다.',
         'type': 'message',
         'time': DateTime.now().toIso8601String(),
       })
