@@ -49,34 +49,46 @@ class _RankingPageState extends State<RankingPage> {
                   try {
                     final docs = snapshot.data!.docs;
                     List<RankBuilder> rankList = [];
+                    int myIdx = 0;
+                    int myglobalToken = 0;
+                    String myId = '';
                     for (var doc in docs) {
                       index++;
                       int globalToken = doc['globalToken'];
                       String id = doc['id'].toString();
-
-                      if (index < 4) {
-                        final rankObject = RankBuilder(
-                          globalToken: globalToken,
-                          id: id,
-                          index: index,
-                        );
-                        rankList.add(rankObject);
-                      }
                       if (_currentPlayer.id == doc['id']) {
-                        int myIdx = index;
-                        print(myIdx);
-                        final rankObject = RankBuilder(
-                          globalToken: _currentPlayer.globalToken,
-                          id: _currentPlayer.id,
-                          index: myIdx,
-                        );
-                        rankList.add(rankObject);
+                        myIdx = index;
+                        myglobalToken = doc['globalToken'];
+                        myId = doc['id'].toString();
                       }
+                      final rankObject = RankBuilder(
+                        globalToken: globalToken,
+                        id: id,
+                        index: index,
+                      );
+                      rankList.add(rankObject);
                     }
-                    return Expanded(
-                        child: ListView(
-                      children: rankList,
-                    ));
+                    return Column(
+                      children: [
+                        Text('나의 랭킹'),
+                        Container(
+                          child: Row(children: [
+                            Text(myIdx.toString()),
+                            Text(myId),
+                            Text(myglobalToken.toString()),
+                          ]),
+                        ),
+                        Divider(
+                          height: 1,
+                        ),
+                        Text('전체 랭킹'),
+                        Expanded(
+                          child: ListView(
+                            children: rankList,
+                          ),
+                        ),
+                      ],
+                    );
                   } on Exception catch (e) {
                     return Center(
                       child: Text(' '),
