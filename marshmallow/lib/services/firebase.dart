@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:marshmallow/models/game.dart';
 import 'package:marshmallow/models/user.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 FirebaseFirestore firestore = FirebaseFirestore.instance;
 FirebaseAuth auth = FirebaseAuth.instance;
@@ -72,9 +73,10 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
 Future<void> handleResult(String currentKey, String tfliteLabel, String code,
     String playerName, String playerUid) async {
   CollectionReference gamerooms = firestore.collection('GameRooms');
-
+  final player = AudioCache();
   //sucess
   if (currentKey == tfliteLabel) {
+  player.play('sounds/success.wav');
     await gamerooms
         .doc(code)
         .collection('Records')
@@ -91,6 +93,7 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
   }
   //fail
   else {
+    player.play('sounds/failure.wav');
     await gamerooms
         .doc(code)
         .collection('Records')

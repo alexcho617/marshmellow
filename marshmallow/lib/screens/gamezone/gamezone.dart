@@ -307,6 +307,7 @@ class RecordStream extends StatelessWidget {
   RecordStream({required this.code, required this.name});
   String code;
   String name;
+  final player = AudioCache();
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -331,8 +332,8 @@ class RecordStream extends StatelessWidget {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
               //per document
-              print (data['type']);
               if(data['type'] == 'success'){  //성공했을 때
+                
                 return Container(
                   height:99,
                   margin: EdgeInsets.all(4),
@@ -354,10 +355,11 @@ class RecordStream extends StatelessWidget {
                 );
               }
               else { //실패했을 때
+              
                 return ListTile(
                   contentPadding: EdgeInsets.zero,
                   subtitle: Text(
-                    data['record'], 
+                    data['record'],
                     textAlign: TextAlign.center,
                     style: body4style()
                   ),
