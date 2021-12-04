@@ -12,7 +12,7 @@ import 'package:marshmallow/utils/colors.dart';
 import 'package:marshmallow/utils/text.dart';
 import 'package:marshmallow/widgets/button.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:marshmallow/services/model.dart';
+import 'package:marshmallow/services/models.dart';
 import 'package:tflite/tflite.dart';
 
 var _getArguments = Get.arguments;
@@ -36,6 +36,7 @@ class _GameZoneState extends State<GameZone> {
   XFile? pickedImage;
   List? _result = [];
   String _name = "";
+  static List<GameUser> globalAllPlayersInfoList = [];
 
   @override
   void initState() {
@@ -49,6 +50,7 @@ class _GameZoneState extends State<GameZone> {
   Widget build(BuildContext context) {
     // List<GameUser> allPlayersInfoList = [];
     // List<String> allPlayersUID = [];
+
     var scaffoldKey = GlobalKey<ScaffoldState>();
     var size = MediaQuery.of(context).size;
     return Scaffold(
@@ -64,6 +66,7 @@ class _GameZoneState extends State<GameZone> {
             children: [point2style(data: 'GAMEZONE')]),
       ),
       drawer: PlayerDrawer(code: _code),
+
       body: SafeArea(
         child: Container(
           color: backgroundBlue,
@@ -87,8 +90,15 @@ class _GameZoneState extends State<GameZone> {
                       : Map();
                   return Column(
                     children: [
+                      Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            point2style(data: 'ROUND '),
+                            point2style(
+                                data: gameData['currentRound'].toString())
+                          ]),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 35),
+                        padding: EdgeInsets.symmetric(horizontal: 35),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
@@ -98,6 +108,7 @@ class _GameZoneState extends State<GameZone> {
                               child: IconButton(
                                 onPressed: () async {
                                   scaffoldKey.currentState!.openDrawer();
+
                                 },
                                 icon: Icon(Icons.menu),
                               ),
@@ -120,18 +131,18 @@ class _GameZoneState extends State<GameZone> {
                           ],
                         ),
                       ),
-                      Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            point2style(data: 'ROUND '),
-                            point2style(
-                                data: gameData['currentRound'].toString())
-                          ]),
+                      
                       //RECORDS STREAM
-                      SizedBox(
-                        height: size.height * 0.62,
-                        child: RecordStream(code: _code, name: _name),
+                      Padding(
+                        padding:EdgeInsets.symmetric(horizontal: size.width*0.1),
+                        child: SizedBox(
+                          
+                           
+                          height: size.height * 0.67,
+                          child: RecordStream(code: _code, name: _name),
+                        ),
                       ),
+                      Spacer(),
                       bigButtonTheme('📷 사진 업로드', () {
                         getImageFromGallery(
                             gameData['keywords'][gameData['currentRound'] - 1]);
@@ -325,10 +336,12 @@ class PlayerDrawer extends StatelessWidget {
   }
 }
 
+
 class RecordStream extends StatelessWidget {
   RecordStream({required this.code, required this.name});
   String code;
   String name;
+  final player = AudioCache();
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<QuerySnapshot>(
@@ -353,14 +366,41 @@ class RecordStream extends StatelessWidget {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
               //per document
-              return Container(
-                margin: EdgeInsets.all(4),
-                height: 60,
-                child: ListTile(
-                  title: Text(data['record']),
-                  subtitle: (Text('${data['type']}-${data['time']}')),
-                ),
-              );
+              if(data['type'] == 'success'){  //성공했을 때
+                
+                return Container(
+                  height:99,
+                  margin: EdgeInsets.only(top:40),
+                  alignment: Alignment.center,
+                  decoration:  BoxDecoration(
+                    color: darkGrey.withOpacity(0.1),
+                    shape: BoxShape.rectangle,
+                    borderRadius: BorderRadius.all( Radius.circular(15))
+                  ),
+                  child: ListTile(
+                    title: Padding(
+                      padding: const EdgeInsets.all(5.0),
+                      child: Image.asset('assets/m.png', width: 22, height: 17,),
+                    ),
+                    subtitle: Text(data['record'], textAlign: TextAlign.center,),
+                  ),
+                );
+              }
+              else { //실패했을 때
+                return Container(
+                  margin: EdgeInsets.only(bottom: 30),
+                  height:20,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    subtitle: Text(
+                      data['record'],
+                      textAlign: TextAlign.center,
+                      style: body4style()
+                    ),
+               
+                  ),
+                );
+              }
             }).toList(),
           );
         } on Exception catch (e) {
