@@ -63,14 +63,14 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
       .add({
         'record': 'Host Created New Game',
         'type': 'message',
-        'time': DateTime.now().toIso8601String()
+        'time': DateTime.now().toIso8601String(),
       })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to initiate records: $error"));
 }
 
 Future<void> handleResult(String currentKey, String tfliteLabel, String code,
-    String playerName) async {
+    String playerName, String playerUid) async {
   CollectionReference gamerooms = firestore.collection('GameRooms');
 
   //sucess
@@ -86,6 +86,7 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
         })
         .then((value) => print("Game Added"))
         .catchError((error) => print("Failed to initiate records: $error"));
+    plusLocalMarsh(playerUid);
   }
   //fail
   else {
@@ -181,4 +182,19 @@ Future<String> getFirebaseUID() async {
   } else {
     return 'Failed:getFirebaseUID';
   }
+}
+
+Future<void> plusLocalMarsh(String uid) async {
+  int localToken = 0;
+  CollectionReference users = firestore.collection('Users');
+  await users.doc(uid).get().then((DocumentSnapshot documentSnapshot) {
+    localToken = documentSnapshot.get("localToken");
+  });
+  await users
+      .doc(uid)
+      .update({
+        'localToken': localToken + 1,
+      })
+      .then((value) => print("User Added"))
+      .catchError((error) => print("Failed to add user: $error"));
 }
