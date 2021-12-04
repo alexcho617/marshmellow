@@ -18,16 +18,15 @@ List<String> wordRepository = [
   "magpie", //o
   "kite",
   "bald eagle", //o
-  "scorpion",
+  "scorpion", //o
   "axolotl",
-  "flamingo",
+  "flamingo", //o
   "triceratops",
-  "Indian cobra",
   "centipede",
-  "goose",
+  "goose", //o
   "jellyfish",
   "pelican",
-  "killer whale",
+  "killer whale", //o
   "zebra", //o
   "church", //o
   "coffeepot", //o
@@ -35,19 +34,16 @@ List<String> wordRepository = [
   "digital clock", //o
   "standard poodle",
   "Maltese dog", //o
-  "Shih-Tzu",
   "Persian cat", //o
   "dumbbell",
   "electric guitar",
   "fountain", //o
-  "golf ball",
+  "golf ball", //o
   "hand blower",
   "microphone", //o
-  "military uniform",
-  "pool table",
-  "mountain bike",
+  "pool table", //o
   "sunglasses",
-  "table lamp",
+  "table lamp", //o
   "violin",
   "traffic light", //o
   "strawberry",
