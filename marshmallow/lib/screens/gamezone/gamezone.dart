@@ -66,7 +66,6 @@ class _GameZoneState extends State<GameZone> {
             children: [point2style(data: 'GAMEZONE')]),
       ),
       drawer: PlayerDrawer(code: _code),
-
       body: SafeArea(
         child: Container(
           color: backgroundBlue,
@@ -108,7 +107,6 @@ class _GameZoneState extends State<GameZone> {
                               child: IconButton(
                                 onPressed: () async {
                                   scaffoldKey.currentState!.openDrawer();
-
                                 },
                                 icon: Icon(Icons.menu),
                               ),
@@ -131,14 +129,13 @@ class _GameZoneState extends State<GameZone> {
                           ],
                         ),
                       ),
-                      
+
                       //RECORDS STREAM
                       Padding(
-                        padding:EdgeInsets.symmetric(horizontal: size.width*0.1),
+                        padding:
+                            EdgeInsets.symmetric(horizontal: size.width * 0.1),
                         child: SizedBox(
-                          
-                           
-                          height: size.height * 0.67,
+                          height: size.height * 0.63,
                           child: RecordStream(code: _code, name: _name),
                         ),
                       ),
@@ -313,15 +310,10 @@ class PlayerDrawer extends StatelessWidget {
                     child: ListView.builder(
                         itemCount: userList.length,
                         itemBuilder: (BuildContext context, int index) {
-                          return Column(
+                          return Row(
                             children: [
-                              // Text(_code),
-                              Row(
-                                children: [
-                                  Text(userList[index].id.toString()),
-                                  Text(userList[index].avatarIndex.toString()),
-                                ],
-                              )
+                              Text(userList[index].id.toString()),
+                              Text(userList[index].avatarIndex.toString()),
                             ],
                           );
                         }),
@@ -335,7 +327,6 @@ class PlayerDrawer extends StatelessWidget {
     );
   }
 }
-
 
 class RecordStream extends StatelessWidget {
   RecordStream({required this.code, required this.name});
@@ -366,38 +357,41 @@ class RecordStream extends StatelessWidget {
               Map<String, dynamic> data =
                   document.data()! as Map<String, dynamic>;
               //per document
-              if(data['type'] == 'success'){  //성공했을 때
-                
+              if (data['type'] == 'success') {
+                //성공했을 때
+
                 return Container(
-                  height:99,
-                  margin: EdgeInsets.only(top:40),
+                  height: 99,
+                  margin: EdgeInsets.only(top: 40),
                   alignment: Alignment.center,
-                  decoration:  BoxDecoration(
-                    color: darkGrey.withOpacity(0.1),
-                    shape: BoxShape.rectangle,
-                    borderRadius: BorderRadius.all( Radius.circular(15))
-                  ),
+                  decoration: BoxDecoration(
+                      color: darkGrey.withOpacity(0.1),
+                      shape: BoxShape.rectangle,
+                      borderRadius: BorderRadius.all(Radius.circular(15))),
                   child: ListTile(
                     title: Padding(
                       padding: const EdgeInsets.all(5.0),
-                      child: Image.asset('assets/m.png', width: 22, height: 17,),
+                      child: Image.asset(
+                        'assets/m.png',
+                        width: 22,
+                        height: 17,
+                      ),
                     ),
-                    subtitle: Text(data['record'], textAlign: TextAlign.center,),
-                  ),
-                );
-              }
-              else { //실패했을 때
-                return Container(
-                  margin: EdgeInsets.only(bottom: 30),
-                  height:20,
-                  child: ListTile(
-                    contentPadding: EdgeInsets.zero,
                     subtitle: Text(
                       data['record'],
                       textAlign: TextAlign.center,
-                      style: body4style()
                     ),
-               
+                  ),
+                );
+              } else {
+                //실패했을 때
+                return Container(
+                  margin: EdgeInsets.only(bottom: 30),
+                  height: 20,
+                  child: ListTile(
+                    contentPadding: EdgeInsets.zero,
+                    subtitle: Text(data['record'],
+                        textAlign: TextAlign.center, style: body4style()),
                   ),
                 );
               }
