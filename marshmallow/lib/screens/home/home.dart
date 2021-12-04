@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:marshmallow/models/user.dart';
 import 'package:marshmallow/screens/gameSetting/gameSetting.dart';
 import 'package:marshmallow/screens/gamezone/gamezone.dart';
+import 'package:marshmallow/screens/result/result.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
@@ -82,6 +83,11 @@ class _HomePageState extends State<HomePage> {
                       Get.to(() => LabPage());
                     },
                     child: Text('MarshLab')),
+                  TextButton(
+                    onPressed: () {
+                      Get.to(() => ResultPage());
+                    },
+                    child: Text('Result page')),
               ],
             ),
             Padding(
