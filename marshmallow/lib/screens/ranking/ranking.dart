@@ -1,14 +1,122 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:marshmallow/services/firebase.dart';
+import 'package:marshmallow/models/user.dart';
+import 'package:marshmallow/utils/colors.dart';
+import 'package:get/get.dart';
 
-class rankingPage extends StatefulWidget {
+var _getArguments = Get.arguments;
+GameUser _currentPlayer = _getArguments[0];
+var index = 0;
+
+class RankingPage extends StatefulWidget {
   @override
-  _rankingPageState createState() => _rankingPageState();
+  _RankingPageState createState() => _RankingPageState();
 }
 
-class _rankingPageState extends State<rankingPage> {
+class _RankingPageState extends State<RankingPage> {
+  final firestore = FirebaseFirestore.instance;
+  @override
+  void initState() {
+    index = 0;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Container();
+    return Scaffold(
+        resizeToAvoidBottomInset: false,
+        backgroundColor: backgroundBlue,
+        appBar: AppBar(
+          backgroundColor: backgroundBlue,
+          elevation: 0,
+          title: Image.asset('assets/logo.png', width: 95),
+        ),
+        body: SafeArea(
+          child: FutureBuilder<QuerySnapshot>(
+              future: firestore
+                  .collection('Users')
+                  .orderBy('globalToken', descending: true)
+                  .get(),
+              builder: (BuildContext context,
+                  AsyncSnapshot<QuerySnapshot> snapshot) {
+                if (snapshot.hasError) {
+                  return Text('Something went wrong');
+                }
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: Text(" "));
+                }
+                if (snapshot.hasData) {
+                  try {
+                    final docs = snapshot.data!.docs;
+                    List<RankBuilder> rankList = [];
+                    int myIdx = 0;
+                    int myglobalToken = 0;
+                    String myId = '';
+                    for (var doc in docs) {
+                      index++;
+                      int globalToken = doc['globalToken'];
+                      String id = doc['id'].toString();
+                      if (_currentPlayer.id == doc['id']) {
+                        myIdx = index;
+                        myglobalToken = doc['globalToken'];
+                        myId = doc['id'].toString();
+                      }
+                      final rankObject = RankBuilder(
+                        globalToken: globalToken,
+                        id: id,
+                        index: index,
+                      );
+                      rankList.add(rankObject);
+                    }
+                    return Column(
+                      children: [
+                        Text('나의 랭킹'),
+                        Container(
+                          child: Row(children: [
+                            Text(myIdx.toString()),
+                            Text(myId),
+                            Text(myglobalToken.toString()),
+                          ]),
+                        ),
+                        Divider(
+                          height: 1,
+                        ),
+                        Text('전체 랭킹'),
+                        Expanded(
+                          child: ListView(
+                            children: rankList,
+                          ),
+                        ),
+                      ],
+                    );
+                  } on Exception catch (e) {
+                    return Center(
+                      child: Text(' '),
+                    );
+                  }
+                }
+                return Text('loading');
+              }),
+        ));
+  }
+}
+
+class RankBuilder extends StatefulWidget {
+  RankBuilder({this.id, this.globalToken, this.index});
+  final id;
+  final globalToken;
+  final index;
+  @override
+  _RankBuilderState createState() => _RankBuilderState();
+}
+
+class _RankBuilderState extends State<RankBuilder> {
+  @override
+  Widget build(BuildContext context) {
+    return Row(children: [
+      Text(widget.index.toString()),
+      Text(widget.id),
+      Text(widget.globalToken.toString()),
+    ]);
   }
 }
