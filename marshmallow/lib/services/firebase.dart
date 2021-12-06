@@ -110,10 +110,20 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
 }
 
 Future<void> firestoreIncreaseRound(String code) async {
+  int currentRound = 0;
   DocumentReference gameroom = firestore.collection('GameRooms').doc(code);
-  await gameroom.update(
-    ({'currentRound': FieldValue.increment(1)}),
-  );
+  await gameroom.get().then((DocumentSnapshot documentSnapshot) {
+    print(
+        'FirestreIncreaseRound_CurrentRound:${documentSnapshot['currentRound']}');
+    currentRound = documentSnapshot['currentRound'];
+  });
+  if (currentRound < 10) {
+    await gameroom.update(
+      ({'currentRound': FieldValue.increment(1)}),
+    );
+  } else {
+    print('End of Round');
+  }
 }
 
 Future<void> firestoreSetRoundOver(String code) async {
