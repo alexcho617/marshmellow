@@ -131,7 +131,7 @@ class _RankingPageState extends State<RankingPage> {
                           SizedBox(height: 20),
                           Center(
                             child: mediumButtonTheme('홈으로', () {
-                              Get.off(HomePage());
+                              Get.offAll(HomePage());
                             }),
                           ),
                         ],

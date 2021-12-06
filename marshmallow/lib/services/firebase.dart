@@ -53,7 +53,8 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
         'playerLimit': newGame.playerLimit,
         'timeLimit': newGame.timeLimit,
         'players': newGame.players,
-        'currentRound': newGame.currentRound
+        'currentRound': newGame.currentRound,
+        'isOver': newGame.isOver
       })
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to add game: $error"));
@@ -89,6 +90,7 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
         .then((value) => print("Game Added"))
         .catchError((error) => print("Failed to initiate records: $error"));
     plusLocalMarsh(playerUid);
+    firestoreIncreaseRound(code);
   }
   //fail
   else {
@@ -111,6 +113,13 @@ Future<void> firestoreIncreaseRound(String code) async {
   DocumentReference gameroom = firestore.collection('GameRooms').doc(code);
   await gameroom.update(
     ({'currentRound': FieldValue.increment(1)}),
+  );
+}
+
+Future<void> firestoreSetRoundOver(String code) async {
+  DocumentReference gameroom = firestore.collection('GameRooms').doc(code);
+  await gameroom.update(
+    ({'isOver': true}),
   );
 }
 
@@ -218,6 +227,26 @@ Future<void> plusLocalMarsh(String uid) async {
       .update({
         'localToken': localToken + 1,
       })
-      .then((value) => print("User Added"))
-      .catchError((error) => print("Failed to add user: $error"));
+      .then((value) => print("plusLocalMarsh: Local Token Added"))
+      .catchError((error) =>
+          print("plusLocalMarsh: Failed to Add Local Token: $error"));
+}
+
+Future<void> updateGlobalMarsh(String uid) async {
+  int localToken = 0;
+  int globalToken = 0;
+  CollectionReference users = firestore.collection('Users');
+  await users.doc(uid).get().then((DocumentSnapshot documentSnapshot) {
+    localToken = documentSnapshot.get("localToken");
+    globalToken = documentSnapshot.get("globalToken");
+  });
+  await users
+      .doc(uid)
+      .update({
+        'globalToken': localToken + globalToken,
+        'localToken': 0,
+      })
+      .then((value) => print("updateGlobalMarsh: Global Token Updated"))
+      .catchError((error) =>
+          print("updateGlobalMarsh: Failed to Update Global Token: $error"));
 }

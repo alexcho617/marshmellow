@@ -5,6 +5,7 @@ import 'package:get/get.dart';
 import 'package:marshmallow/models/user.dart';
 import 'package:marshmallow/screens/gameSetting/gameSetting.dart';
 import 'package:marshmallow/screens/gamezone/gamezone.dart';
+import 'package:marshmallow/screens/result/result.dart';
 import 'package:marshmallow/screens/setting/setting.dart';
 import 'package:marshmallow/services/firebase.dart';
 import 'package:marshmallow/utils/colors.dart';
@@ -45,6 +46,41 @@ class _HomePageState extends State<HomePage> {
         backgroundColor: backgroundBlue,
         elevation: 0,
         title: Image.asset('assets/logo.png', width: 95),
+        iconTheme: IconThemeData(color: darkGrey),
+      ),
+      drawer: Drawer(
+
+        child: ListView(
+          padding: EdgeInsets.zero, 
+          children: [
+            DrawerHeader(
+              padding: EdgeInsets.only(left: 30, bottom: 15),
+              decoration: BoxDecoration(
+                color: blue,
+              ),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.end,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Image.asset('assets/m.png', width: 30),
+                  SizedBox(height: 10),
+                  point2style(data:'MARSHMALLOW', color:yellow)
+                  
+                ],
+              )
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(left: 30),
+              child: TextButton(onPressed: signOut, child: Text('SignOut',style: body1style(),textAlign: TextAlign.start,))
+            ),
+            Container(
+              alignment: Alignment.centerLeft,
+              padding: EdgeInsets.only(left: 30),
+              child: TextButton(onPressed: () {Get.to(() => LabPage());}, child: Text('Marsh Lab',style: body1style(),textAlign: TextAlign.start,))
+            ),
+          ]
+        )
       ),
       body: Container(
         padding: EdgeInsets.symmetric(horizontal: 34),
@@ -74,16 +110,7 @@ class _HomePageState extends State<HomePage> {
                     ],
                   )
                 : Text('User Loading'),
-            Row(
-              children: [
-                TextButton(onPressed: signOut, child: Text('SignOut')),
-                TextButton(
-                    onPressed: () {
-                      Get.to(() => LabPage());
-                    },
-                    child: Text('MarshLab')),
-              ],
-            ),
+            
             Padding(
               padding: const EdgeInsets.symmetric(vertical: 30),
               child: Image.asset('assets/home.png'),
@@ -143,7 +170,8 @@ class _HomePageState extends State<HomePage> {
                       },
                     ))
               ],
-            )
+            ),
+            
           ],
         ),
       ),
@@ -199,7 +227,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future _asyncInputDialog(BuildContext context) async {
-    String teamName = '';
+    String entranceCode = '';
 
     return showDialog(
       context: context,
@@ -239,19 +267,19 @@ class _HomePageState extends State<HomePage> {
                     ),
                     style: body6style(),
                     onChanged: (value) {
-                      teamName = value;
+                      entranceCode = value;
                     },
                   ),
                 ),
                 SizedBox(height: 14),
                 smallButtonTheme('들어가기', () async {
                   try {
-                    await firestoreRegisterGame(teamName, currentPlayer.uid);
+                    await firestoreRegisterGame(entranceCode, currentPlayer.uid);
                     setState(() {
                       currentPlayer.type = UserType.player;
                     });
                     Get.to(() => GameZone(),
-                        arguments: [teamName, currentPlayer]);
+                        arguments: [entranceCode, currentPlayer]);
                   } on Exception catch (e) {
                     showDialog(
                         context: context,
