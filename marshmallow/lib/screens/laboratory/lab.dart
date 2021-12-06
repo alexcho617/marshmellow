@@ -46,38 +46,6 @@ class _LabPageState extends State<LabPage> {
     super.dispose();
   }
 
-  List<Widget> displayBoxesAroundRecognizedObjects(Size screen) {
-    if (res == null) return [];
-
-    double factorX = screen.width;
-    double factorY = screen.height;
-
-    Color colorPick = Colors.pink;
-
-    return res!.map((result) {
-      return Positioned(
-        left: result["rect"]["x"] * factorX,
-        top: result["rect"]["y"] * factorY,
-        width: result["rect"]["w"] * factorX,
-        height: result["rect"]["h"] * factorY,
-        child: Container(
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(10.0)),
-            border: Border.all(color: Colors.pink, width: 2.0),
-          ),
-          child: Text(
-            "${result['detectedClass']} ${(result['confidenceInClass'] * 100).toStringAsFixed(0)}%",
-            style: TextStyle(
-              background: Paint()..color = colorPick,
-              color: Colors.black,
-              fontSize: 18.0,
-            ),
-          ),
-        ),
-      );
-    }).toList();
-  }
-
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
@@ -99,10 +67,6 @@ class _LabPageState extends State<LabPage> {
         ),
       ),
     );
-
-    if (cameraImage != null) {
-      list.addAll(displayBoxesAroundRecognizedObjects(size));
-    }
 
     return SafeArea(
       child: Scaffold(

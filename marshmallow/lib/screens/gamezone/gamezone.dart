@@ -51,6 +51,12 @@ class _GameZoneState extends State<GameZone> {
   }
 
   @override
+  void dispose() {
+    Tflite.close();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     // List<GameUser> allPlayersInfoList = [];
     // List<String> allPlayersUID = [];
@@ -135,7 +141,8 @@ class _GameZoneState extends State<GameZone> {
                                   SkipButton(gameData['currentRound'])
                                 else
                                   EndButton()
-                              else SizedBox(width:66)
+                              else
+                                SizedBox(width: 66)
                             ],
                           ),
                         ),
