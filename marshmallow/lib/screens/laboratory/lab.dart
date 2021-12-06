@@ -11,26 +11,25 @@ class LabPage extends StatefulWidget {
 }
 
 class _LabPageState extends State<LabPage> {
-  late CameraController _camera;
-  bool _cameraInitialized = false;
-  late CameraImage _savedImage;
+  late CameraController cameraController;
+  late CameraImage cameraImage;
+  List? res = [];
 
   void _initializeCamera() async {
-    List<CameraDescription> cameras = await availableCameras();
-    _camera = new CameraController(cameras[0], ResolutionPreset.veryHigh);
-    _camera.initialize().then((_) async {
-      await _camera
-          .startImageStream((CameraImage image) => _processCameraImage(image));
-      setState(() {
-        _cameraInitialized = true;
+    try {
+      List<CameraDescription> cameras = await availableCameras();
+      cameraController = CameraController(cameras[0], ResolutionPreset.medium);
+      cameraController.initialize().then((value) {
+        setState(() {
+          cameraController.startImageStream((image) => {
+                cameraImage = image,
+                // applyModelOnCamera(),
+              });
+        });
       });
-    });
-  }
-
-  void _processCameraImage(CameraImage image) async {
-    setState(() {
-      _savedImage = image;
-    });
+    } catch (e) {
+      print("error of initialize Camera");
+    }
   }
 
   @override
@@ -42,46 +41,107 @@ class _LabPageState extends State<LabPage> {
 
   @override
   void dispose() {
-    _camera.stopImageStream();
+    cameraController.stopImageStream();
+    Tflite.close();
     super.dispose();
+  }
+
+  List<Widget> displayBoxesAroundRecognizedObjects(Size screen) {
+    if (res == null) return [];
+
+    double factorX = screen.width;
+    double factorY = screen.height;
+
+    Color colorPick = Colors.pink;
+
+    return res!.map((result) {
+      return Positioned(
+        left: result["rect"]["x"] * factorX,
+        top: result["rect"]["y"] * factorY,
+        width: result["rect"]["w"] * factorX,
+        height: result["rect"]["h"] * factorY,
+        child: Container(
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(10.0)),
+            border: Border.all(color: Colors.pink, width: 2.0),
+          ),
+          child: Text(
+            "${result['detectedClass']} ${(result['confidenceInClass'] * 100).toStringAsFixed(0)}%",
+            style: TextStyle(
+              background: Paint()..color = colorPick,
+              color: Colors.black,
+              fontSize: 18.0,
+            ),
+          ),
+        ),
+      );
+    }).toList();
   }
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: backgroundBlue,
-      appBar: AppBar(
-        backgroundColor: backgroundBlue,
-        elevation: 0,
-        automaticallyImplyLeading: false,
-        centerTitle: true,
-        title: Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [point2style(data: 'GAMEZONE')]),
-      ),
-      body: SafeArea(
-          child: !_camera.value.isInitialized
-              ? Container()
+    Size size = MediaQuery.of(context).size;
+    List<Widget> list = [];
+    list.add(
+      Positioned(
+        top: 0.0,
+        left: 0.0,
+        width: size.width,
+        height: size.height - 100,
+        child: Container(
+          height: size.height - 100,
+          child: (!cameraController.value.isInitialized)
+              ? new Container()
               : AspectRatio(
-                  aspectRatio: _camera.value.aspectRatio,
-                  child: CameraPreview(_camera),
-                )),
+                  aspectRatio: cameraController.value.aspectRatio,
+                  child: CameraPreview(cameraController),
+                ),
+        ),
+      ),
+    );
+
+    if (cameraImage != null) {
+      list.addAll(displayBoxesAroundRecognizedObjects(size));
+    }
+
+    return SafeArea(
+      child: Scaffold(
+        backgroundColor: backgroundBlue,
+        appBar: AppBar(
+          backgroundColor: backgroundBlue,
+          elevation: 0,
+          automaticallyImplyLeading: false,
+          centerTitle: true,
+          title: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [point2style(data: 'GAMEZONE')]),
+        ),
+        body: Container(
+          margin: EdgeInsets.only(top: 50),
+          color: Colors.black,
+          child: Stack(
+            children: list,
+          ),
+        ),
+      ),
     );
   }
 
-  // applyModelOnCamera() async {
-  //   var res = await Tflite.detectObjectOnFrame(
-  //     bytesList: cameraImage.planes.map((plane) {
-  //       return plane.bytes;
-  //     }).toList(), // required
-  //     model: "YOLO",
-  //     imageHeight: cameraImage.height,
-  //     imageWidth: cameraImage.width,
-  //     numResultsPerClass: 2, // defaults to 5
-  //   );
-  //   setState(() {
-  //     _result = res;
-  //     print(_result);
-  //   });
-  // }
+  applyModelOnCamera() async {
+    res = await Tflite.detectObjectOnFrame(
+      bytesList: cameraImage.planes.map((plane) {
+        return plane.bytes;
+      }).toList(),
+      imageHeight: cameraImage.height,
+      imageWidth: cameraImage.width,
+      imageMean: 127.5,
+      imageStd: 127.5,
+      numResultsPerClass: 1,
+      threshold: 0.4,
+    );
+
+    setState(() {
+      cameraImage;
+    });
+  }
 }
