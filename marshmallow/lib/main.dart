@@ -24,7 +24,7 @@ void main() async {
 }
 
 //change this to true to enable splash
-bool splashEnabled = false;
+bool splashEnabled = true;
 
 class MyApp extends StatelessWidget {
   @override
