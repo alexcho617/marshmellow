@@ -14,6 +14,14 @@
 	<string>marshmallow</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string></string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string></string>
+	<key>NSCameraUsageDescription</key>
+	<string>Can I use the camera please?</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Can I use the mic please?</string>
 	<key>CFBundleShortVersionString</key>
 	<string>$(FLUTTER_BUILD_NAME)</string>
 	<key>CFBundleSignature</key>

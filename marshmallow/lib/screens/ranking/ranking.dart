@@ -17,7 +17,6 @@ class RankingPage extends StatefulWidget {
 
 class _RankingPageState extends State<RankingPage> {
   final firestore = FirebaseFirestore.instance;
-
   @override
   Widget build(BuildContext context) {
     var size = MediaQuery.of(context).size;
