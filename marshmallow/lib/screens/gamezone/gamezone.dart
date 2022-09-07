@@ -46,8 +46,14 @@ class _GameZoneState extends State<GameZone> {
   void initState() {
     super.initState();
     checkFirebaseUser();
-    loadMyModel();
+    loadModel(0);
     _printInfo();
+  }
+
+  @override
+  void dispose() {
+    Tflite.close();
+    super.dispose();
   }
 
   @override
@@ -135,7 +141,8 @@ class _GameZoneState extends State<GameZone> {
                                   SkipButton(gameData['currentRound'])
                                 else
                                   EndButton()
-                              else SizedBox(width:66)
+                              else
+                                SizedBox(width: 66)
                             ],
                           ),
                         ),

@@ -12,11 +12,9 @@ List avatarRepository = [
 
 List<String> wordRepository = [
   "goldfish",
-  "cock", //o
   "ostrich", //o
   "bulbul", //o
   "magpie", //o
-  "kite",
   "bald eagle", //o
   "scorpion", //o
   "axolotl",
@@ -36,7 +34,6 @@ List<String> wordRepository = [
   "Maltese dog", //o
   "Persian cat", //o
   "dumbbell",
-  "electric guitar",
   "fountain", //o
   "golf ball", //o
   "hand blower",
