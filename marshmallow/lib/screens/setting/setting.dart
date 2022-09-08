@@ -180,7 +180,7 @@ class _SettingPageState extends State<SettingPage> {
     }
   }
 
-  void snackbar(String title, String message) {
+  SnackbarController snackbar(String title, String message) {
     return Get.snackbar(
       title,
       message,
@@ -192,7 +192,7 @@ class _SettingPageState extends State<SettingPage> {
       colorText: darkGrey,
       duration: Duration(seconds: 2),
       isDismissible: true,
-      dismissDirection: SnackDismissDirection.HORIZONTAL,
+      dismissDirection: DismissDirection.horizontal,
       forwardAnimationCurve: Curves.easeOutBack,
     );
   }
