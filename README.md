@@ -16,8 +16,6 @@ Marshmallow is a image recognition game using computer vision and machine learni
 
 [![](https://img.shields.io/badge/Flutter-02569B?style=for-the-badge&logo=flutter&logoColor=white)]()
 [![](https://img.shields.io/badge/Firestore-orange?style=for-the-badge&logo=google&logoColor=white)]()
-[![](https://img.shields.io/badge/Swift-red?style=for-the-badge&logo=swift&logoColor=white)]()
-[![](https://img.shields.io/badge/AWS-orange?style=for-the-badge&logo=amazon&logoColor=white)]()
 
 
 
