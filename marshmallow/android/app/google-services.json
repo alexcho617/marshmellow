@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "571975908530",
+    "project_id":"marshmallow-97d30",
+    "storage_bucket": "marshmallow-8ac76.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1001220354419:ios:1ac6a386bbc5e509949506",
+        "android_client_info": {
+          "package_name": "com.alexcho617.marshmallow"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1001220354419-sk9t17lkme366coqhs3dauuc6dpsp85t.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDZo7tjuIeO-kAKdz5ZyK1SRO7HrlhrDAs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1001220354419-sk9t17lkme366coqhs3dauuc6dpsp85t.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
