@@ -70,7 +70,6 @@ Future<void> firestoreNewGame(Game newGame, String code) async {
       .then((value) => print("Game Added"))
       .catchError((error) => print("Failed to initiate records: $error"));
 }
-
 Future<void> handleResult(String currentKey, String tfliteLabel, String code,
     String playerName, String playerUid) async {
   CollectionReference gamerooms = firestore.collection('GameRooms');
@@ -78,36 +77,54 @@ Future<void> handleResult(String currentKey, String tfliteLabel, String code,
   //sucess
   if (currentKey == tfliteLabel) {
     player.play('sounds/success.wav');
-    await gamerooms
-        .doc(code)
-        .collection('Records')
-        .add({
-          'record': '$playerName님이 인식에 성공하여\n마시멜로를 획득하였습니다 🎉',
-          // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
-          'type': 'success',
-          'time': DateTime.now().toIso8601String()
-        })
-        .then((value) => print("Game Added"))
-        .catchError((error) => print("Failed to initiate records: $error"));
-    plusLocalMarsh(playerUid);
-    firestoreIncreaseRound(code);
+
+    // run transaction to prevent race condition
+    await firestore.runTransaction((transaction) async {
+      DocumentSnapshot gameRoom = await transaction.get(gamerooms.doc(code));
+
+      // update game room data
+      int currentRound = gameRoom.data()['round'];
+      transaction.update(gamerooms.doc(code), {'round': currentRound + 1});
+
+      // add record to collection
+      await transaction.set(gamerooms.doc(code).collection('Records').doc(), {
+        'record': '$playerName님이 인식에 성공하여\n마시멜로를 획득하였습니다 🎉',
+        'type': 'success',
+        'time': DateTime.now().toIso8601String()
+      });
+    }).then((value) {
+      // transaction succeeded
+      plusLocalMarsh(playerUid);
+    }).catchError((error) {
+      // transaction failed
+      print("Transaction failed: $error");
+    });
   }
   //fail
   else {
     player.play('sounds/failure.wav');
-    await gamerooms
-        .doc(code)
-        .collection('Records')
-        .add({
-          'record': '$playerName님이 인식에 실패했습니다.',
-          // currentKey:$currentKey - tfliteLabel:$tfliteLabel',
-          'type': 'failure',
-          'time': DateTime.now().toIso8601String()
-        })
-        .then((value) => print("Game Added"))
-        .catchError((error) => print("Failed to initiate records: $error"));
+
+    // run transaction to prevent race condition
+    await firestore.runTransaction((transaction) async {
+      DocumentSnapshot gameRoom = await transaction.get(gamerooms.doc(code));
+
+      // update game room data
+      int currentRound = gameRoom.data()['round'];
+      transaction.update(gamerooms.doc(code), {'round': currentRound + 1});
+
+      // add record to collection
+      await transaction.set(gamerooms.doc(code).collection('Records').doc(), {
+        'record': '$playerName님이 인식에 실패했습니다.',
+        'type': 'failure',
+        'time': DateTime.now().toIso8601String()
+      });
+    }).catchError((error) {
+      // transaction failed
+      print("Transaction failed: $error");
+    });
   }
 }
+
 
 Future<void> firestoreIncreaseRound(String code) async {
   int currentRound = 0;
