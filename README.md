@@ -6,7 +6,7 @@
 
 Marshmallow is a image recognition game using computer vision and machine learning. Users can search images of the keyword and receive marshmallows for correct image returned. Although it is a game, Marshmallow can serve as an educational purpose as well.
 
-![Logo](https://firebasestorage.googleapis.com/v0/b/portfolio-f64ed.appspot.com/o/marshmallow_logo.png?alt=media&token=c2443989-cdca-4ff6-a5fd-196a2f8b3d7a)
+<img src = "https://firebasestorage.googleapis.com/v0/b/portfolio-f64ed.appspot.com/o/marshmallow_logo.png?alt=media&token=c2443989-cdca-4ff6-a5fd-196a2f8b3d7a" width = 30%>
 
 ## Roadmap
 
@@ -19,21 +19,11 @@ Marshmallow is a image recognition game using computer vision and machine learni
 [![](https://img.shields.io/badge/Figma-F24E1E?style=for-the-badge&logo=figma&logoColor=white)]()
 
 
-
-
-
-
 ## Demo
 
-
-
-
-
-
-![Lobby](https://firebasestorage.googleapis.com/v0/b/portfolio-f64ed.appspot.com/o/marshmallow1.png?alt=media&token=06fdfd51-8718-4825-b9ef-e26a4c4807c2)
-![Setting](https://firebasestorage.googleapis.com/v0/b/portfolio-f64ed.appspot.com/o/marshmallow3.png?alt=media&token=dd25492b-bfb1-4b4a-82fc-917426e1b107)
-![Game](https://firebasestorage.googleapis.com/v0/b/portfolio-f64ed.appspot.com/o/marshmallow4.png?alt=media&token=a565937f-0f7f-4f29-9ef0-5fec07619d0a)
-
+<img src = "https://firebasestorage.googleapis.com/v0/b/portfolio-f64ed.appspot.com/o/marshmallow1.png?alt=media&token=06fdfd51-8718-4825-b9ef-e26a4c4807c2" width = 30%>
+<img src = "https://firebasestorage.googleapis.com/v0/b/portfolio-f64ed.appspot.com/o/marshmallow3.png?alt=media&token=dd25492b-bfb1-4b4a-82fc-917426e1b107" width = 30%>
+<img src = "https://firebasestorage.googleapis.com/v0/b/portfolio-f64ed.appspot.com/o/marshmallow4.png?alt=media&token=a565937f-0f7f-4f29-9ef0-5fec07619d0a" width = 30%>
 ## License
 
 [MIT](https://choosealicense.com/licenses/mit/)
